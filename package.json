@@ -1,0 +1,28 @@
+{
+  "name": "parser",
+  "version": "1.0.0",
+  "description": "parser",
+  "scripts": {
+    "start": "nodemon src/index.js --exec babel-node",
+    "clear": "rm -rf dist && mkdir dist",
+    "build": "npm run clear && babel src -d dist",
+    "serve": "node dist/index.js"
+  },
+  "bin": "./index.js",
+  "author": "sergey.topolov",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "exceljs": "^1.6.2",
+    "htmlparser2": "^3.9.2",
+    "lodash": "^4.17.11",
+    "node-scrapy": "^0.3.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0"
+  }
+}
