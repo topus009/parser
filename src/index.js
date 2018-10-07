@@ -35,7 +35,6 @@ const init = () => {
         labels.push(fileName);
     });
     Promise.all(promises).then(res => {
-        console.warn({res});
         const preparedExcel = prepareExcel(res, labels);
         buildReport(preparedExcel);
     });

@@ -42,7 +42,6 @@ const prepareExcel = (data, labels) => {
             };
         }
         splittedValuesData[index] = result;
-        console.warn(splittedValuesData);
     });
     return sortIndexedData(splittedValuesData, labels);
 }
