@@ -3,7 +3,6 @@ const helpers = require('./helpers');
 const files = require('./files');
 const prepareExcel = require('./prepareExcel');
 const buildReport = require('./workbook');
-// const workbook = require('./workbook');
 
 const lists = [
     {
@@ -36,7 +35,7 @@ const init = () => {
     });
     Promise.all(promises).then(res => {
         const preparedExcel = prepareExcel(res, labels);
-        buildReport(preparedExcel);
+        buildReport(preparedExcel, lists);
     });
 }
 
