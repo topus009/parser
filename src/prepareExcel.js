@@ -1,25 +1,22 @@
 const _ = require('lodash');
 
-const sortIndexedData = (data, labels) => {
-    const newData = {};
+const sortIndexedData = data => {
     const shopsTitles = {};
     _.each(data, (item, itemIndex) => {
-        const indexedField = {};
         _.each(item.title, (title, titleIndex) => {
-            const regex = /([.])([a-zA-Z]{0,3})$/ig;
-            const normalizeTitle = title.toLowerCase().replace(regex, '');
+            const regex = /([ .])([a-zа-я]{0,3})$/ig;
+            const regex2 = /([ .'`’-]{1,2})/g;
+            const normalizeTitle = title.toLowerCase().replace(regex, '').replace(regex2, '');
             if(!shopsTitles[normalizeTitle]) {
                 shopsTitles[normalizeTitle] = [];
             }
-            indexedField[normalizeTitle] = item.value[titleIndex];
             shopsTitles[normalizeTitle][itemIndex] = item.value[titleIndex];
         });
-        newData[labels[itemIndex]] = indexedField;
     });
     return shopsTitles;
 }
 
-const prepareExcel = (data, labels) => {
+const prepareExcel = data => {
     const splittedValuesData = {};
     _.each(data, (item, index) => {
         let result = item;
@@ -43,7 +40,7 @@ const prepareExcel = (data, labels) => {
         }
         splittedValuesData[index] = result;
     });
-    return sortIndexedData(splittedValuesData, labels);
+    return sortIndexedData(splittedValuesData);
 }
 
 module.exports = prepareExcel;

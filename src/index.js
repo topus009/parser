@@ -3,8 +3,9 @@ const helpers = require('./helpers');
 const files = require('./files');
 const prepareExcel = require('./prepareExcel');
 const buildReport = require('./workbook');
+const pre_megafon = require('./megafon/pre_megafon');
 
-const lists = [
+const full = [
     {
         fileName: 'promokodi_net',
         uri: 'https://promokodi.net/store/cashback/'
@@ -23,20 +24,24 @@ const lists = [
     },
 ];
 
-const init = () => {
+// const megafon = [
+//     '',
+//     '',
+// ];
+
+const init = async () => {
     const promises = [];
-    const labels = [];
     const {load} = helpers;
-    _.forEach(lists, item => {
+    // full
+    _.forEach(full, item => {
         const {fileName, uri} = item;
-        const script = files[fileName];
-        promises.push(load({uri, fileName, script}));
-        labels.push(fileName);
+        const script = files.full[fileName];
+        promises.push(load({uri, script}));
     });
-    Promise.all(promises).then(res => {
-        const preparedExcel = prepareExcel(res, labels);
-        buildReport(preparedExcel, lists);
-    });
+    const res = await Promise.all(promises);
+    const allShops = await pre_megafon.loadPreRequest();
+    const preparedExcel = prepareExcel(res);
+    buildReport(preparedExcel, full);
 }
 
 init();

@@ -5,7 +5,7 @@ const rp = require('request-promise');
 //--------------- full
 const options = uri => ({
   uri: uri,
-  // proxy: 'http://nw-proxy.megafon.ru:3128',
+  proxy: 'http://nw-proxy.megafon.ru:3128',
   transform: function(body) {
     return cheerio.load(body, {
       useHtmlParser2: true,
@@ -19,7 +19,7 @@ const options = uri => ({
   strictSSL: false,
 });
 
-const load = async ({uri, fileName, script}) => {
+const load = async ({uri, script}) => {
   const {selector, model, prepareData} = script;
   const $ = await rp(options(uri));
   const preparedResult = {};
