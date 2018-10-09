@@ -24,11 +24,6 @@ const full = [
     },
 ];
 
-// const megafon = [
-//     '',
-//     '',
-// ];
-
 const init = async () => {
     const promises = [];
     const {load} = helpers;
@@ -38,9 +33,9 @@ const init = async () => {
         const script = files.full[fileName];
         promises.push(load({uri, script}));
     });
-    const res = await Promise.all(promises);
-    const allShops = await pre_megafon.loadPreRequest();
-    const preparedExcel = prepareExcel(res);
+    const fullRes = await Promise.all(promises);
+    const megafon_links = await pre_megafon.loadPreRequest();
+    const preparedExcel = prepareExcel(fullRes);
     buildReport(preparedExcel, full);
 }
 

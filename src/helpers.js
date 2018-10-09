@@ -2,11 +2,17 @@ const cheerio = require('cheerio');
 const _ = require('lodash');
 const rp = require('request-promise');
 
-//--------------- full
-const options = uri => ({
-  uri: uri,
+const baseOptions = uri => ({
   proxy: 'http://nw-proxy.megafon.ru:3128',
-  transform: function(body) {
+  method: 'GET',
+  strictSSL: false,
+  uri: uri,
+});
+
+//--------------- full
+const parseHTMLOptions = {
+  ...baseOptions,
+  transform: body => {
     return cheerio.load(body, {
       useHtmlParser2: true,
       withStartIndices: false,
@@ -15,11 +21,20 @@ const options = uri => ({
       decodeEntities: false
     });
   },
-  method: 'GET',
-  strictSSL: false,
-});
+};
 
 const load = async ({uri, script}) => {
+  const {selector, model, prepareData} = script;
+  const $ = await rp(parseHTMLOptions(uri));
+  const preparedResult = {};
+  const itemInBody = $(selector);
+  _.forEach(model, (path, index) => {
+    preparedResult[index] = prepareData(itemInBody, index, path);
+  });
+  return preparedResult;
+};
+
+const megafon_list_load = async ({uri, script}) => {
   const {selector, model, prepareData} = script;
   const $ = await rp(options(uri));
   const preparedResult = {};
