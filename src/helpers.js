@@ -11,7 +11,6 @@ const baseOptions = uri => ({
 
 //--------------- full
 const parseHTMLOptions = {
-  ...baseOptions,
   transform: body => {
     return cheerio.load(body, {
       useHtmlParser2: true,
@@ -23,9 +22,11 @@ const parseHTMLOptions = {
   },
 };
 
+
+
 const load = async ({uri, script}) => {
   const {selector, model, prepareData} = script;
-  const $ = await rp(parseHTMLOptions(uri));
+  const $ = await rp({...baseOptions(uri), ...parseHTMLOptions});
   const preparedResult = {};
   const itemInBody = $(selector);
   _.forEach(model, (path, index) => {
@@ -34,18 +35,13 @@ const load = async ({uri, script}) => {
   return preparedResult;
 };
 
-const megafon_list_load = async ({uri, script}) => {
-  const {selector, model, prepareData} = script;
-  const $ = await rp(options(uri));
-  const preparedResult = {};
-  const itemInBody = $(selector);
-  _.forEach(model, (path, index) => {
-    preparedResult[index] = prepareData(itemInBody, index, path);
-  });
-  return preparedResult;
+const megafon_load = async ({uri}) => {
+  const res = await rp(baseOptions(uri));
+  return JSON.parse(res);
 };
 
 //--------------- full
 module.exports = {
-  load
+  load,
+  megafon_load
 }

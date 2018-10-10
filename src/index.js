@@ -4,6 +4,7 @@ const files = require('./files');
 const prepareExcel = require('./prepareExcel');
 const buildReport = require('./workbook');
 const pre_megafon = require('./megafon/pre_megafon');
+const prepare_megafon = require('./megafon/megafon');
 
 const full = [
     {
@@ -26,17 +27,29 @@ const full = [
 
 const init = async () => {
     const promises = [];
-    const {load} = helpers;
+    const megafon_promises = [];
+    const {load, megafon_load} = helpers;
     // full
     _.forEach(full, item => {
         const {fileName, uri} = item;
         const script = files.full[fileName];
         promises.push(load({uri, script}));
     });
-    const fullRes = await Promise.all(promises);
     const megafon_links = await pre_megafon.loadPreRequest();
-    const preparedExcel = prepareExcel(fullRes);
-    buildReport(preparedExcel, full);
+    _.forEach(megafon_links, uri => {
+        megafon_promises.push(megafon_load({uri}));
+    });
+    const fullRes = await Promise.all(promises);
+    const megafonRes = await Promise.all(megafon_promises);
+    const prepared_megafon = prepare_megafon(megafonRes);
+    const preparedExcel = prepareExcel({fullRes, prepared_megafon});
+    const lists = [
+        {
+            fileName: 'megafon'
+        },
+        ...full
+    ];
+    buildReport(preparedExcel, lists);
 }
 
 init();
