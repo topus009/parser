@@ -43,30 +43,48 @@ function addTableHeader(sheet, lists) {
     });
 }
 
-function addTable(sheet, data) {
-    const firstRow = sheet.lastRow + 1;
+function addTable(sheet, data, maxValueIndexes) {
+    const firstRow = sheet.lastRow.number + 1;
     firstRow.height = 50;
     _.each(data, shop => {
         const {title, value} = shop;
         sheet.addRow([title, ...value]);
     });
-    // sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
-    //     // if(rowNumber >= firstRow) {
-    //         row.eachCell((cell, colIndex) => {
-    //             // if(colIndex > 1) {
-    //                 // currentRow.alignment = {horizontal: 'center'};
-    //             // }
-    //         });
-    //     // }
-    // });
+    // const lastRow = firstRow + maxValueIndexes.length - 1;
+    const lastRow = sheet.lastRow.number;
+
+    sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
+        if(rowNumber >= firstRow && rowNumber <= lastRow) {
+            row.eachCell((cell, colIndex) => {
+                // cell.font = {
+                //     ...cell.font,
+                //     color: {argb: '008009'}
+                // };
+                if(colIndex > 1) {
+                    const target = maxValueIndexes[rowNumber];
+                    if(_.isNumber(target) && colIndex === target) {
+                        cell.font = {color: {argb: '008009'}};
+                    } else {
+                        cell.font = {color: {argb: 'ff0000'}};
+                    }
+                }
+            });
+        }
+    });
+
+    // if(maxValueIndexes[shopIndex]) {
+    //     cell.font = {color: {argb: '#008009'}};
+    // } else {
+    //     cell.font = {color: {argb: '#ff0000'}};
+    // }
 }
 
-const buildReport = (data, lists) => {
+const buildReport = (data, lists, maxValueIndexes) => {
     const sheet = workbook.addWorksheet('Отчет');
     const colsCount = lists.length;
     addHeader(sheet, title, colsCount);
     addTableHeader(sheet, lists);
-    addTable(sheet, data);
+    addTable(sheet, data, maxValueIndexes);
     workbook.xlsx.writeFile(`${title}.xlsx`);
 }
 //================== heplers =================

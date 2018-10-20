@@ -42,14 +42,17 @@ const init = async () => {
     const fullRes = await Promise.all(promises);
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = prepare_megafon(megafonRes);
-    const preparedExcel = prepareExcel({fullRes, prepared_megafon});
+    const {
+        sortedTitleData: preparedExcel,
+        maxValueIndexes
+    } = prepareExcel({fullRes, prepared_megafon});
     const lists = [
         {
             fileName: 'megafon'
         },
         ...full
     ];
-    buildReport(preparedExcel, lists);
+    buildReport(preparedExcel, lists, maxValueIndexes);
 }
 
 init();

@@ -25,6 +25,39 @@ const sortIndexedData = ({splittedValuesData, prepared_megafon}) => {
     return shopsTitles;
 }
 
+const findMaxValue = data => {
+    const comparedValues = {};
+    _.each(data, (item, index) => {
+        comparedValues[index] = [];
+        if (item.value.length > 1) {
+            _.each(item.value, (val, ind) => {
+                if(val && typeof val === 'string') {
+                    if(val.match(/%/g)) {
+                        comparedValues[index].push(
+                            {
+                                position: ind,
+                                value: parseFloat(val.replace(/([A-ZА-Я ])/ig, ''))
+                            }
+                        );
+                    }
+                }
+            });
+        }
+    });
+    const maxValues = _.map(comparedValues, item => {
+        let max = _.maxBy(item, 'value');
+        const multipleMax = _.map(item, (v, i) => {
+            if(max) {
+                if(v === max.value) return i;
+            }
+        });
+        if(max) return max.position;
+        return max;
+    });
+    console.log({multipleMax});
+    return maxValues;
+}
+
 const prepareExcel = ({fullRes, prepared_megafon}) => {
     const splittedValuesData = {};
     _.each(fullRes, (item, index) => {
@@ -51,11 +84,19 @@ const prepareExcel = ({fullRes, prepared_megafon}) => {
     });
     const sortedIndexedData = sortIndexedData({splittedValuesData, prepared_megafon});
     const sortedTitleData = _.sortBy(
-        _.map(sortedIndexedData, (item, index) => ({
-            title: index,
-            value: item
-        })), 'title');
-    return sortedTitleData;
+        _.map(sortedIndexedData, (item, index) => {
+            const value = _.map(item, val => {
+                if(val) {
+                    return val.replace(/([,])/g, '.');
+                } return val;
+            });
+            return {
+                title: index,
+                value
+            };
+        }), 'title');
+    const maxValueIndexes = findMaxValue(sortedTitleData);
+    return {sortedTitleData, maxValueIndexes};
 }
 
 module.exports = prepareExcel;

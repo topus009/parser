@@ -22,8 +22,6 @@ const parseHTMLOptions = {
   },
 };
 
-
-
 const load = async ({uri, script}) => {
   const {selector, model, prepareData} = script;
   const $ = await rp({...baseOptions(uri), ...parseHTMLOptions});
