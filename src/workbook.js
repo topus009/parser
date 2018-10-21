@@ -22,7 +22,8 @@ function addHeader(sheet, title, colsCount) {
     sheet.getRow(1).eachCell(cell => {
         cell.font = {
             ...cell.font,
-            bold: true
+            bold: true,
+            size: 16
         };
     });
     sheet.addRow(['']);
@@ -32,7 +33,6 @@ function addTableHeader(sheet, lists) {
     const sites = _.map(lists, 'fileName');
     sheet.addRow(['', ...sites]);
     const currentRow = sheet.getRow(sheet.rowCount);
-
     currentRow.alignment = {horizontal: 'center', vertical: 'middle'};
     currentRow.height = 30;
     currentRow.eachCell(cell => {
@@ -40,21 +40,32 @@ function addTableHeader(sheet, lists) {
             ...cell.font,
             bold: true
         };
+        setCellBorder(sheet, cell, 'thick', ['top', 'left', 'right', 'bottom']);
     });
 }
 
-function addTable(sheet, data) {
+function addTable(sheet, data, lists) {
+    const listsLength = lists.length;
     const firstRow = sheet.lastRow.number + 1;
     firstRow.height = 50;
-    _.each(data, shop => {
+    let dataWithEmptyCells = _.cloneDeep(data);
+    _.each(data, (item, index) => {
+        const currentLength = item.value.length;
+        const count = listsLength - currentLength;
+        if(count) {
+            const fillArray = _.times(count, _.constant([undefined, false]));
+            dataWithEmptyCells[index] = {
+                title: item.title,
+                value: [...item.value, ...fillArray]
+            };
+        }
+    });
+    _.each(dataWithEmptyCells, shop => {
         const {title, value} = shop;
         const cellValues = _.map(value, val => {
             if(!val[0]) {
-                return '-----'
-            }
-            else if(value.length === 1) {
                 return {'richText': [
-                    {'font': {'color': {'argb': 'ff0000'}},'text': val[0]},
+                    {'font': {'color': {'argb': 'ff0000'}},'text': ''},
                 ]};
             }
             else if(val[1] === false) {
@@ -68,7 +79,32 @@ function addTable(sheet, data) {
         });
         sheet.addRow([title, ...cellValues]);
     });
-
+    const lastRow = sheet.lastRow.number;
+    sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
+        if(rowNumber >= firstRow && rowNumber <= lastRow) {
+            row.eachCell((cell, colNumber) => {
+                if(colNumber === 1) {
+                    setCellBorder(sheet, cell, 'thick', ['left', 'right']);
+                    if(rowNumber === lastRow) {
+                        setCellBorder(sheet, cell, 'thick', ['left', 'right', 'bottom']);
+                    }
+                } else if(colNumber === listsLength + 1) {
+                    setCellBorder(sheet, cell, 'thick', ['right']);
+                } else {
+                    setCellBorder(sheet, cell, 'thin', ['left', 'right']);
+                    if(rowNumber === lastRow) {
+                        cell.border = {
+                            bottom: {style:'thick'},
+                            right: {style:'thin'}
+                        };
+                    }
+                }
+                if(rowNumber === lastRow && colNumber === listsLength + 1) {
+                    setCellBorder(sheet, cell, 'thick', ['bottom', 'right']);
+                }
+            });
+        }
+    });
 }
 
 const buildReport = (data, lists) => {
@@ -76,7 +112,7 @@ const buildReport = (data, lists) => {
     const colsCount = lists.length;
     addHeader(sheet, title, colsCount);
     addTableHeader(sheet, lists);
-    addTable(sheet, data);
+    addTable(sheet, data, lists);
     workbook.xlsx.writeFile(`${title}.xlsx`);
 }
 //================== heplers =================
@@ -86,19 +122,19 @@ function mergeCells(sheet, cellsRangeMap) {
     });
 }
 
-function fillCelsBG(sheet, cells, colors) {
-    const baseFillOptions = {
-        type: 'pattern',
-        pattern: 'solid'
-    };
-    eachCell(sheet, cells, (cell, cellIndex) => {
-        const color = colors[cellIndex];
-        cell.fill = {
-            ...baseFillOptions,
-            fgColor: {argb: color}
-        };
-    });
-}
+// function fillCelsBG(sheet, cells, colors) {
+//     const baseFillOptions = {
+//         type: 'pattern',
+//         pattern: 'solid'
+//     };
+//     eachCell(sheet, cells, (cell, cellIndex) => {
+//         const color = colors[cellIndex];
+//         cell.fill = {
+//             ...baseFillOptions,
+//             fgColor: {argb: color}
+//         };
+//     });
+// }
 
 function setCellBorder(sheet, cells, style, sides) {
     const obj = {};

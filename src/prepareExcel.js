@@ -29,7 +29,7 @@ const findMaxValue = data => {
     const comparedValues = {};
     _.each(data, (item, index) => {
         comparedValues[index] = [];
-        if (item.value.length > 1) {
+        if (item.value.length > 0) {
             _.each(item.value, (val, ind) => {
                 if(val && typeof val === 'string') {
                     if(val.match(/%/g)) {
@@ -103,8 +103,11 @@ const prepareExcel = ({fullRes, prepared_megafon}) => {
         return {
             title: data.title,
             value: _.map(data.value, (val, ind) => {
+                if(data.value.length === 1) {
+                    return [val, true];
+                }
                 const targetColorPos = _.find(maxValueIndexes[dataInd], v => v === ind);
-                if(targetColorPos) {
+                if(targetColorPos >= 0) {
                     return [val, true];
                 } return [val, false];
             })
