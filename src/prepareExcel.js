@@ -36,7 +36,8 @@ const findMaxValue = data => {
                         comparedValues[index].push(
                             {
                                 position: ind,
-                                value: parseFloat(val.replace(/([A-ZА-Я ])/ig, ''))
+                                value: parseFloat(val.replace(/([A-ZА-Я ])/ig, '')),
+                                title: item.title
                             }
                         );
                     }
@@ -44,18 +45,19 @@ const findMaxValue = data => {
             });
         }
     });
-    const maxValues = _.map(comparedValues, item => {
-        let max = _.maxBy(item, 'value');
-        const multipleMax = _.map(item, (v, i) => {
-            if(max) {
-                if(v === max.value) return i;
-            }
-        });
-        if(max) return max.position;
-        return max;
+    const maxValues = _.map(comparedValues, item => [_.maxBy(item, 'value')]);
+    _.each(maxValues, (v, i) => {
+        if(v && v[0] && v[0].value) {
+            const sameValues = _.filter(comparedValues[i], sameItem => {
+                return sameItem.value === v[0].value && sameItem.position !== v[0].position;
+            });
+            maxValues[i] = [...maxValues[i], ...sameValues];
+        }
     });
-    console.log({multipleMax});
-    return maxValues;
+    return _.map(maxValues, values => {
+        if(values.length) return _.map(values, 'position');
+        return values;
+    });
 }
 
 const prepareExcel = ({fullRes, prepared_megafon}) => {
@@ -96,7 +98,19 @@ const prepareExcel = ({fullRes, prepared_megafon}) => {
             };
         }), 'title');
     const maxValueIndexes = findMaxValue(sortedTitleData);
-    return {sortedTitleData, maxValueIndexes};
+
+    const preparedExcel = _.map(sortedTitleData, (data, dataInd) => {
+        return {
+            title: data.title,
+            value: _.map(data.value, (val, ind) => {
+                const targetColorPos = _.find(maxValueIndexes[dataInd], v => v === ind);
+                if(targetColorPos) {
+                    return [val, true];
+                } return [val, false];
+            })
+        };
+    });
+    return preparedExcel;
 }
 
 module.exports = prepareExcel;

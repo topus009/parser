@@ -35,24 +35,24 @@ const init = async () => {
         const script = files.full[fileName];
         promises.push(load({uri, script}));
     });
+    // full-end
+    // megafon
     const megafon_links = await pre_megafon.loadPreRequest();
     _.forEach(megafon_links, uri => {
         megafon_promises.push(megafon_load({uri}));
     });
+    // megafon-end
     const fullRes = await Promise.all(promises);
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = prepare_megafon(megafonRes);
-    const {
-        sortedTitleData: preparedExcel,
-        maxValueIndexes
-    } = prepareExcel({fullRes, prepared_megafon});
+    const preparedExcel = prepareExcel({fullRes, prepared_megafon});
     const lists = [
         {
             fileName: 'megafon'
         },
         ...full
     ];
-    buildReport(preparedExcel, lists, maxValueIndexes);
+    buildReport(preparedExcel, lists);
 }
 
 init();

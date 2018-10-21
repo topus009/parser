@@ -3,12 +3,12 @@ const rp = require('request-promise');
 
 const options = uri => ({
     uri: uri,
-    proxy: 'http://nw-proxy.megafon.ru:3128',
+    // proxy: 'http://nw-proxy.megafon.ru:3128',
     transform: body => {
         return JSON.parse(body)
     },
     method: 'GET',
-    strictSSL: false,
+    // strictSSL: false,
 });
 
 const allMegafonShopsURL = 'https://special.megafon.ru/api/categories';

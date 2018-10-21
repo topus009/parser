@@ -43,48 +43,40 @@ function addTableHeader(sheet, lists) {
     });
 }
 
-function addTable(sheet, data, maxValueIndexes) {
+function addTable(sheet, data) {
     const firstRow = sheet.lastRow.number + 1;
     firstRow.height = 50;
     _.each(data, shop => {
         const {title, value} = shop;
-        sheet.addRow([title, ...value]);
-    });
-    // const lastRow = firstRow + maxValueIndexes.length - 1;
-    const lastRow = sheet.lastRow.number;
-
-    sheet.eachRow({includeEmpty: true}, (row, rowNumber) => {
-        if(rowNumber >= firstRow && rowNumber <= lastRow) {
-            row.eachCell((cell, colIndex) => {
-                // cell.font = {
-                //     ...cell.font,
-                //     color: {argb: '008009'}
-                // };
-                if(colIndex > 1) {
-                    const target = maxValueIndexes[rowNumber];
-                    if(_.isNumber(target) && colIndex === target) {
-                        cell.font = {color: {argb: '008009'}};
-                    } else {
-                        cell.font = {color: {argb: 'ff0000'}};
-                    }
-                }
-            });
-        }
+        const cellValues = _.map(value, val => {
+            if(!val[0]) {
+                return '-----'
+            }
+            else if(value.length === 1) {
+                return {'richText': [
+                    {'font': {'color': {'argb': 'ff0000'}},'text': val[0]},
+                ]};
+            }
+            else if(val[1] === false) {
+                return {'richText': [
+                    {'font': {'color': {'argb': 'ff0000'}},'text': val[0]},
+                ]};
+            }
+            else if(val[1] === true) return {'richText': [
+                {'font': {'color': {'argb': '008009'}},'text': val[0]},
+            ]};
+        });
+        sheet.addRow([title, ...cellValues]);
     });
 
-    // if(maxValueIndexes[shopIndex]) {
-    //     cell.font = {color: {argb: '#008009'}};
-    // } else {
-    //     cell.font = {color: {argb: '#ff0000'}};
-    // }
 }
 
-const buildReport = (data, lists, maxValueIndexes) => {
+const buildReport = (data, lists) => {
     const sheet = workbook.addWorksheet('Отчет');
     const colsCount = lists.length;
     addHeader(sheet, title, colsCount);
     addTableHeader(sheet, lists);
-    addTable(sheet, data, maxValueIndexes);
+    addTable(sheet, data);
     workbook.xlsx.writeFile(`${title}.xlsx`);
 }
 //================== heplers =================
