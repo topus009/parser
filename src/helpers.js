@@ -22,6 +22,12 @@ const parseHTMLOptions = {
   },
 };
 
+const parseJSONOptions = {
+  transform: body => {
+    return JSON.parse(body)
+  },
+};
+
 const load = async ({uri, script}) => {
   const {selector, model, prepareData} = script;
   const $ = await rp({...baseOptions(uri), ...parseHTMLOptions});
@@ -41,5 +47,7 @@ const megafon_load = async ({uri}) => {
 //--------------- full
 module.exports = {
   load,
-  megafon_load
+  megafon_load,
+  baseOptions,
+  parseJSONOptions,
 }

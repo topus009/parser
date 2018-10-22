@@ -1,15 +1,6 @@
 const _ = require('lodash');
 const rp = require('request-promise');
-
-const options = uri => ({
-    uri: uri,
-    // proxy: 'http://nw-proxy.megafon.ru:3128',
-    transform: body => {
-        return JSON.parse(body)
-    },
-    method: 'GET',
-    // strictSSL: false,
-});
+const helpers = require('../helpers');
 
 const allMegafonShopsURL = 'https://special.megafon.ru/api/categories';
 
@@ -36,11 +27,10 @@ const generateRequestLinks = categories => {
 };
 
 const loadPreRequest = async () => {
-    const allMegafonShops = await rp(options(allMegafonShopsURL));
+    const {baseOptions, parseJSONOptions} = helpers;
+    const allMegafonShops = await rp({...baseOptions(allMegafonShopsURL), ...parseJSONOptions});
     countPages(allMegafonShops);
     return _.flatten(generateRequestLinks(allMegafonShops.categories));
 };
-
-
 
 module.exports = {loadPreRequest}

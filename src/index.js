@@ -25,26 +25,33 @@ const full = [
     },
 ];
 
+// const paging = [
+//     {
+//         fileName: 'letyshops',
+//         uri: 'https://letyshops.com/shops'
+//     },
+// ];
+
 const init = async () => {
-    const promises = [];
-    const megafon_promises = [];
     const {load, megafon_load} = helpers;
-    // full
+    // ================= full ===============================
+    const full_promises = [];
     _.forEach(full, item => {
         const {fileName, uri} = item;
         const script = files.full[fileName];
-        promises.push(load({uri, script}));
+        full_promises.push(load({uri, script}));
     });
-    // full-end
-    // megafon
+    const fullRes = await Promise.all(full_promises);
+    // ================= full-end ==========================
+    // ================= megafon ===========================
+    const megafon_promises = [];
     const megafon_links = await pre_megafon.loadPreRequest();
     _.forEach(megafon_links, uri => {
         megafon_promises.push(megafon_load({uri}));
     });
-    // megafon-end
-    const fullRes = await Promise.all(promises);
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = prepare_megafon(megafonRes);
+    // ================= megafon-end ======================
     const preparedExcel = prepareExcel({fullRes, prepared_megafon});
     const lists = [
         {
