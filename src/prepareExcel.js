@@ -1,8 +1,8 @@
 const _ = require('lodash');
 
-const sortIndexedData = ({splittedValuesData, prepared_megafon}) => {
+const sortIndexedData = ({splittedData, prepared_megafon}) => {
     const shopsTitles = {};
-    _.each(splittedValuesData, (item, itemIndex) => {
+    _.each(splittedData, (item, itemIndex) => {
         _.each(item.title, (title, titleIndex) => {
             const regex = /([ .])([a-zа-я]{0,3})$/ig;
             const regex2 = /([ .'`’-]{1,2})/g;
@@ -60,9 +60,9 @@ const findMaxValue = data => {
     });
 }
 
-const prepareExcel = ({fullRes, prepared_megafon}) => {
-    const splittedValuesData = {};
-    _.each(fullRes, (item, index) => {
+const splitData = prevData => {
+    const newData = {};
+    _.each(prevData, (item, index) => {
         let result = item;
         if(item.format) {
             const {format, value} = item;
@@ -82,9 +82,39 @@ const prepareExcel = ({fullRes, prepared_megafon}) => {
                 value: composedValue
             };
         }
-        splittedValuesData[index] = result;
+        newData[index] = result;
     });
-    const sortedIndexedData = sortIndexedData({splittedValuesData, prepared_megafon});
+    return newData;
+}
+
+const combineRes = ({fullRes, pagingRes}) => {
+    const preparedPagingRes = [];
+    _.each(pagingRes, item => {
+        const itemData = {
+            title: [],
+            format: [],
+            value: []
+        };
+        _.each(itemData, (path, pathTitle) => {
+            _.each(item, page => {
+                _.each(page, (pageValues, pageField) => {
+                    if(pathTitle === pageField) {
+                        const path = itemData[pathTitle];
+                        itemData[pathTitle] = _.concat(path, pageValues);
+                    }
+                });
+            });
+        });
+        preparedPagingRes.push(itemData);
+    });
+    const combinedData = _.concat(fullRes, preparedPagingRes);
+    return combinedData;
+}
+
+const prepareExcel = ({prepared_megafon, fullRes, pagingRes}) => {
+    const combinedData = combineRes({fullRes, pagingRes});
+    const splittedData = splitData(combinedData);
+    const sortedIndexedData = sortIndexedData({splittedData, prepared_megafon});
     const sortedTitleData = _.sortBy(
         _.map(sortedIndexedData, (item, index) => {
             const value = _.map(item, val => {

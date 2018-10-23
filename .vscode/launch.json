@@ -10,7 +10,10 @@
             "sourceMaps": true,
             "args": [
                 "--harmony"
-            ]
+            ],
+            "showAsyncStacks": true,
+            "protocol": "inspector",
+            "stopOnEntry": false
         }
     ]
 }

@@ -4,7 +4,7 @@ const files = require('./files');
 const prepareExcel = require('./prepareExcel');
 const buildReport = require('./workbook');
 const pre_megafon = require('./megafon/pre_megafon');
-const prepare_megafon = require('./megafon/megafon');
+const megafon = require('./megafon/megafon');
 
 const full = [
     {
@@ -25,16 +25,16 @@ const full = [
     },
 ];
 
-// const paging = [
-//     {
-//         fileName: 'letyshops',
-//         uri: 'https://letyshops.com/shops'
-//     },
-// ];
+const paging = [
+    {
+        fileName: 'letyshops',
+        uri: 'https://letyshops.com/shops'
+    },
+];
 
 const init = async () => {
     const {load, megafon_load} = helpers;
-    // ================= full ===============================
+    // ================= full ==============================
     const full_promises = [];
     _.forEach(full, item => {
         const {fileName, uri} = item;
@@ -50,14 +50,49 @@ const init = async () => {
         megafon_promises.push(megafon_load({uri}));
     });
     const megafonRes = await Promise.all(megafon_promises);
-    const prepared_megafon = prepare_megafon(megafonRes);
-    // ================= megafon-end ======================
-    const preparedExcel = prepareExcel({fullRes, prepared_megafon});
+    const prepared_megafon = megafon(megafonRes);
+    // ================= megafon-end =======================
+    // ================= paging ============================
+    const paging_pre_promises = [];
+    const paging_promises = {};
+    _.forEach(paging, ({fileName, uri}) => {
+        const {pre_load} = files.paging[fileName];
+        paging_pre_promises.push(pre_load({uri, title: fileName}));
+    });
+    const paging_links = await Promise.all(paging_pre_promises);
+    for(const item of paging) {
+        const {fileName} = item;
+        const {
+            prepare: script,
+            prefilter
+        } = files.paging[fileName];
+        for(const links of paging_links) {
+            const shopLinks = links[fileName];
+            if(shopLinks) {
+                paging_promises[fileName] = [];
+                for(const uri of shopLinks) {
+                    paging_promises[fileName].push(load({uri, script, prefilter}));
+                }
+            }
+        }
+    }
+    const pagingRes = {};
+    for(const site in paging_promises) {
+        const siteRes = await Promise.all(paging_promises[site]);
+        pagingRes[site] = siteRes;
+    }
+    // ================= paging-end ========================
+    const preparedExcel = prepareExcel({
+        prepared_megafon,
+        fullRes,
+        pagingRes,
+    });
     const lists = [
         {
             fileName: 'megafon'
         },
-        ...full
+        ...full,
+        ...paging,
     ];
     buildReport(preparedExcel, lists);
 }

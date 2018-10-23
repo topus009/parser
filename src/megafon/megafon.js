@@ -1,6 +1,8 @@
 const _ = require('lodash');
+const helpers = require('../helpers');
 
-const prepare_megafon = data => {
+const megafon = data => {
+    const {normalizeTitle} = helpers;
     const all_partners = [];
     _.each(data, res => {
         all_partners.push(...res.partners);
@@ -12,16 +14,12 @@ const prepare_megafon = data => {
         const {cashback_variants} = partner;
         const target_variant = _.last(cashback_variants);
         const {cashback_type, increased_client_amount} = target_variant;
+        const normalizedTitle = normalizeTitle(index);
         let format_symbol = '';
-        const regex1 = /-ru|-com$|([ .])([a-zа-я]{0,3})$/ig;
-        const regex2 = /([ .'`’-]{1,2})/g;
-        const normalizeTitle = index.toLowerCase()
-            .replace(regex1, '')
-            .replace(regex2, '');
         if(cashback_type === 'percent') {
             format_symbol = '%';
         }
-        partners_with_values[normalizeTitle] = {
+        partners_with_values[normalizedTitle] = {
             format: format_symbol,
             value: increased_client_amount
         };
@@ -29,4 +27,4 @@ const prepare_megafon = data => {
     return partners_with_values;
 }
 
-module.exports = prepare_megafon;
+module.exports = megafon;
