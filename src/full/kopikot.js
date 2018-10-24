@@ -12,11 +12,7 @@ const prepareData = (item, index, path) => {
     let result = null;
     switch (index) {
         case 'format':
-            result = _.map(item, el => {
-                const format = _.get(el, path);
-                if(format) return format.trim();
-                return null;
-            });
+            result = _.map(item, el => _.get(el, path));
             break;
         case 'title':
         case 'value':

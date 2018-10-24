@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const rp = require('request-promise');
 const helpers = require('../helpers');
 
 const uri = 'https://special.megafon.ru/api/categories';
