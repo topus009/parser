@@ -1,4 +1,5 @@
 // full
+// const kopikot = require('./full/kopikot');
 const promokodi_net = require('./full/promokodi_net');
 const simplybestcoupons = require('./full/simplybestcoupons');
 const shopingbox = require('./full/shopingbox');
@@ -8,6 +9,7 @@ const letyshops = require('./paging/letyshops');
 
 module.exports = {
     full: {
+        // kopikot,
         promokodi_net,
         simplybestcoupons,
         shopingbox,

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const helpers = require('../helpers');
 
-const megafon = data => {
+const prepareData = data => {
     const {normalizeTitle} = helpers;
     const all_partners = [];
     _.each(data, res => {
@@ -27,4 +27,4 @@ const megafon = data => {
     return partners_with_values;
 }
 
-module.exports = megafon;
+module.exports = prepareData;

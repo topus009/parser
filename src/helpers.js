@@ -3,10 +3,14 @@ const _ = require('lodash');
 const rp = require('request-promise');
 
 const baseOptions = uri => ({
+  uri: uri,
   proxy: 'http://nw-proxy.megafon.ru:3128',
   method: 'GET',
   strictSSL: false,
-  uri: uri,
+  // tunnel: true,
+  // timeout: 10000,
+  // pool: {maxSockets: Infinity},
+  // resolveWithFullResponse: true,
 });
 
 const parseHTMLOptions = {
@@ -27,33 +31,44 @@ const parseJSONOptions = {
   },
 };
 
-const load = async ({uri, script, prefilter}) => {
+const load = async ({uri, script, prefilter, json}) => {
   const {selector, model, prepareData} = script;
-  const $ = await rp({...baseOptions(uri), ...parseHTMLOptions});
   const preparedResult = {};
-  let itemInBody = null;
-  if(prefilter) {
-    itemInBody = prefilter($(selector));
+  let $ = null;
+  if(json) {
+    $ = await JSON_load(uri);
+    _.forEach(model, (path, index) => {
+      preparedResult[index] = prepareData($, index, path, uri);
+    });
   } else {
-    itemInBody = $(selector);
+    $ = await HTML_load(uri);
+    let itemInBody = null;
+    if(prefilter) {
+      itemInBody = prefilter($(selector));
+    } else {
+      itemInBody = $(selector);
+    }
+    _.forEach(model, (path, index) => {
+      preparedResult[index] = prepareData(itemInBody, index, path, uri);
+    });
   }
-  _.forEach(model, (path, index) => {
-    preparedResult[index] = prepareData(itemInBody, index, path, uri);
-  });
   return preparedResult;
 };
 
 const pre_load_links = async ({uri, selector, getLastPage, newUrl}) => {
-  const $ = await rp({...baseOptions(uri), ...parseHTMLOptions});
+  const $ = await HTML_load(uri);
   const itemInBody = $(selector);
   const lastPage = getLastPage(itemInBody);
   const pages =  _.times(lastPage, num => num + 1);
   return _.map(pages, page => newUrl(page));
 };
 
-const megafon_load = async ({uri}) => {
-  const res = await rp(baseOptions(uri));
-  return JSON.parse(res);
+const JSON_load = async uri => {
+  await rp({...baseOptions(uri), ...parseJSONOptions});
+};
+
+const HTML_load = async uri => {
+  return await rp({...baseOptions(uri), ...parseHTMLOptions});
 };
 
 const normalizeTitle = title => {
@@ -66,7 +81,8 @@ const normalizeTitle = title => {
 
 module.exports = {
   load,
-  megafon_load,
+  JSON_load,
+  HTML_load,
   baseOptions,
   parseJSONOptions,
   normalizeTitle,

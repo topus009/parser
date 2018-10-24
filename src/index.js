@@ -7,39 +7,49 @@ const pre_megafon = require('./megafon/pre_megafon');
 const megafon = require('./megafon/megafon');
 
 const full = [
+    // {
+    //     fileName: 'kopikot',
+    //     uri: 'https://api.kopikot.ru/campaigns?limit=100&offset=0',
+    //     json: false
+    // },
     {
         fileName: 'promokodi_net',
-        uri: 'https://promokodi.net/store/cashback/'
+        uri: 'https://promokodi.net/store/cashback/',
+        json: false
     },
     {
         fileName: 'simplybestcoupons',
-        uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/'
+        uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
+        json: false
     },
     {
         fileName: 'shopingbox',
-        uri: 'http://shopingbox.ru/box/all/'
+        uri: 'http://shopingbox.ru/box/all/',
+        json: false
     },
     {
         fileName: 'cashback_ru',
-        uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all'
+        uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
+        json: false
     },
 ];
 
 const paging = [
     {
         fileName: 'letyshops',
-        uri: 'https://letyshops.com/shops'
+        uri: 'https://letyshops.com/shops',
+        json: false
     },
 ];
 
 const init = async () => {
-    const {load, megafon_load} = helpers;
+    const {load, JSON_load} = helpers;
     // ================= full ==============================
     const full_promises = [];
     _.forEach(full, item => {
-        const {fileName, uri} = item;
+        const {fileName, uri, json} = item;
         const script = files.full[fileName];
-        full_promises.push(load({uri, script}));
+        full_promises.push(load({uri, script, json}));
     });
     const fullRes = await Promise.all(full_promises);
     // ================= full-end ==========================
@@ -47,7 +57,7 @@ const init = async () => {
     const megafon_promises = [];
     const megafon_links = await pre_megafon.loadPreRequest();
     _.forEach(megafon_links, uri => {
-        megafon_promises.push(megafon_load({uri}));
+        megafon_promises.push(JSON_load(uri));
     });
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = megafon(megafonRes);

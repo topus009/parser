@@ -2,7 +2,7 @@ const _ = require('lodash');
 const rp = require('request-promise');
 const helpers = require('../helpers');
 
-const allMegafonShopsURL = 'https://special.megafon.ru/api/categories';
+const uri = 'https://special.megafon.ru/api/categories';
 
 const newUrl = (categoty, page) =>
     `https://special.megafon.ru/api/partners?category=${categoty}&per_page=100&page=${page}`;
@@ -27,8 +27,8 @@ const generateRequestLinks = categories => {
 };
 
 const loadPreRequest = async () => {
-    const {baseOptions, parseJSONOptions} = helpers;
-    const allMegafonShops = await rp({...baseOptions(allMegafonShopsURL), ...parseJSONOptions});
+    const {JSON_load} = helpers;
+    const allMegafonShops = await JSON_load(uri);
     countPages(allMegafonShops);
     return _.flatten(generateRequestLinks(allMegafonShops.categories));
 };
