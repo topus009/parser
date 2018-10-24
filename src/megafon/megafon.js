@@ -14,12 +14,11 @@ const prepareData = data => {
         const {cashback_variants} = partner;
         const target_variant = _.last(cashback_variants);
         const {cashback_type, increased_client_amount} = target_variant;
-        const normalizedTitle = normalizeTitle(index);
         let format_symbol = '';
         if(cashback_type === 'percent') {
             format_symbol = '%';
         }
-        partners_with_values[normalizedTitle] = {
+        partners_with_values[normalizeTitle(index)] = {
             format: format_symbol,
             value: increased_client_amount
         };

@@ -1,26 +1,25 @@
 const _ = require('lodash');
+const helpers = require('./helpers');
 
 const sortIndexedData = ({splittedData, prepared_megafon}) => {
     const shopsTitles = {};
+    const {normalizeTitle} = helpers;
     _.each(splittedData, (item, itemIndex) => {
         _.each(item.title, (title, titleIndex) => {
-            const regex = /([ .])([a-zа-я]{0,3})$/ig;
-            const regex2 = /([ .'`’-]{1,2})/g;
-            const normalizeTitle = title.toLowerCase()
-                .replace(regex, '')
-                .replace(regex2, '');
-            if(!shopsTitles[normalizeTitle]) {
-                shopsTitles[normalizeTitle] = [];
+            if(!shopsTitles[normalizeTitle(title)]) {
+                shopsTitles[normalizeTitle(title)] = [];
             }
-            shopsTitles[normalizeTitle][itemIndex] = item.value[titleIndex];
+            shopsTitles[normalizeTitle(title)][itemIndex] = item.value[titleIndex];
         });
     });
     _.each(prepared_megafon, (item, title) => {
         const {format, value} = item;
         const formatted_value = `${value}${format}`;
-        if(!shopsTitles[title]) {
+        if(shopsTitles[title]) {
+            shopsTitles[title].unshift(formatted_value);
+        } else {
             shopsTitles[title] = [formatted_value];
-        } else shopsTitles[title].unshift(formatted_value);
+        }
     });
     return shopsTitles;
 }
@@ -107,7 +106,7 @@ const combineRes = ({fullRes, pagingRes}) => {
         });
         preparedPagingRes.push(itemData);
     });
-    const combinedData = _.concat(fullRes, preparedPagingRes);
+    const combinedData = [...fullRes, ...preparedPagingRes];
     return combinedData;
 }
 

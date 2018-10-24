@@ -4,9 +4,9 @@ const rp = require('request-promise');
 
 const baseOptions = uri => ({
   uri: uri,
-  proxy: 'http://nw-proxy.megafon.ru:3128',
+  // proxy: 'http://nw-proxy.megafon.ru:3128',
   method: 'GET',
-  strictSSL: false,
+  // strictSSL: false,
   // tunnel: true,
   // timeout: 10000,
   // pool: {maxSockets: Infinity},
@@ -27,48 +27,49 @@ const parseHTMLOptions = {
 
 const parseJSONOptions = {
   transform: body => {
-    return JSON.parse(body)
+    return JSON.parse(body);
   },
 };
 
-const load = async ({uri, script, prefilter, json}) => {
+const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt}) => {
   const {selector, model, prepareData} = script;
   const preparedResult = {};
   let $ = null;
   if(json) {
-    $ = await JSON_load(uri);
-    _.forEach(model, (path, index) => {
-      preparedResult[index] = prepareData($, index, path, uri);
+    $ = await JSON_load({uri, opt});
+    _.each(model, (path, index) => {
+      preparedResult[index] = prepareData($, selector, index, path, uri);
     });
+    return preparedResult;
   } else {
-    $ = await HTML_load(uri);
+    $ = await HTML_load({uri, opt});
     let itemInBody = null;
     if(prefilter) {
       itemInBody = prefilter($(selector));
     } else {
       itemInBody = $(selector);
     }
-    _.forEach(model, (path, index) => {
+    _.each(model, (path, index) => {
       preparedResult[index] = prepareData(itemInBody, index, path, uri);
     });
+    return preparedResult;
   }
-  return preparedResult;
 };
 
 const pre_load_links = async ({uri, selector, getLastPage, newUrl}) => {
-  const $ = await HTML_load(uri);
+  const $ = await HTML_load({uri});
   const itemInBody = $(selector);
   const lastPage = getLastPage(itemInBody);
   const pages =  _.times(lastPage, num => num + 1);
   return _.map(pages, page => newUrl(page));
 };
 
-const JSON_load = async uri => {
-  await rp({...baseOptions(uri), ...parseJSONOptions});
+const JSON_load = async ({uri, opt}) => {
+  return await rp({...baseOptions(uri), ...parseJSONOptions, ...opt});
 };
 
-const HTML_load = async uri => {
-  return await rp({...baseOptions(uri), ...parseHTMLOptions});
+const HTML_load = async ({uri, opt}) => {
+  return await rp({...baseOptions(uri), ...parseHTMLOptions, ...opt});
 };
 
 const normalizeTitle = title => {

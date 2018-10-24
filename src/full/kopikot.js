@@ -1,22 +1,21 @@
 
 const _ = require('lodash');
 
-const selector = '';
+const selector = 'items';
 const model = {
-    title: '',
-    format: '',
-    value: '',
+    title: 'title',
+    format: 'commission.max.unit',
+    value: 'commission.max.amount',
 };
 
-const prepareData = (item, index, path) => {
+const prepareData = (item, selector, index, path, uri) => {
     let result = null;
+    const target = item[selector];
     switch (index) {
         case 'format':
-            result = _.map(item, el => _.get(el, path));
-            break;
         case 'title':
         case 'value':
-            result = _.map(item, el => _.get(el, path));
+            result = _.map(target, el => _.get(el, path));
             break;
         default:
             console.log('KOPIKOT = НИЧЕГО НЕ НАЙДЕНО')

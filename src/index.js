@@ -7,11 +7,14 @@ const pre_megafon = require('./megafon/pre_megafon');
 const megafon = require('./megafon/megafon');
 
 const full = [
-    // {
-    //     fileName: 'kopikot',
-    //     uri: 'https://api.kopikot.ru/campaigns?limit=100&offset=0',
-    //     json: false
-    // },
+    {
+        fileName: 'kopikot',
+        uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
+        json: true,
+        extendedRequestOptions: {
+            headers: {'x-bonusway-locale': 'ru'}
+        }
+    },
     {
         fileName: 'promokodi_net',
         uri: 'https://promokodi.net/store/cashback/',
@@ -47,9 +50,9 @@ const init = async () => {
     // ================= full ==============================
     const full_promises = [];
     _.forEach(full, item => {
-        const {fileName, uri, json} = item;
+        const {fileName, ...rest} = item;
         const script = files.full[fileName];
-        full_promises.push(load({uri, script, json}));
+        full_promises.push(load({script, ...rest}));
     });
     const fullRes = await Promise.all(full_promises);
     // ================= full-end ==========================
@@ -57,7 +60,7 @@ const init = async () => {
     const megafon_promises = [];
     const megafon_links = await pre_megafon.loadPreRequest();
     _.forEach(megafon_links, uri => {
-        megafon_promises.push(JSON_load(uri));
+        megafon_promises.push(JSON_load({uri}));
     });
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = megafon(megafonRes);
@@ -71,7 +74,7 @@ const init = async () => {
     });
     const paging_links = await Promise.all(paging_pre_promises);
     for(const item of paging) {
-        const {fileName} = item;
+        const {fileName, ...rest} = item;
         const {
             prepare: script,
             prefilter
@@ -81,7 +84,7 @@ const init = async () => {
             if(shopLinks) {
                 paging_promises[fileName] = [];
                 for(const uri of shopLinks) {
-                    paging_promises[fileName].push(load({uri, script, prefilter}));
+                    paging_promises[fileName].push(load({script, prefilter, ...rest, uri}));
                 }
             }
         }

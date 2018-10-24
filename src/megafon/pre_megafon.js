@@ -27,7 +27,7 @@ const generateRequestLinks = categories => {
 
 const loadPreRequest = async () => {
     const {JSON_load} = helpers;
-    const allMegafonShops = await JSON_load(uri);
+    const allMegafonShops = await JSON_load({uri});
     countPages(allMegafonShops);
     return _.flatten(generateRequestLinks(allMegafonShops.categories));
 };
