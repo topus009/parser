@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "parser",
   "scripts": {
-    "start": "nodemon src/index.js --exec babel-node",
-    "clear": "rm -rf dist && mkdir dist",
-    "build": "npm run clear && babel src -d dist",
-    "serve": "node dist/index.js"
+    "start": "electron .",
+    "dist": "build"
   },
-  "bin": "./index.js",
+  "main": "main.js",
   "author": "sergey.topolov",
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
@@ -16,5 +14,16 @@
     "lodash": "^4.17.11",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "electron": "^3.0.5",
+    "electron-builder": "^20.28.4"
+  },
+  "build": {
+    "appId": "com.topus009.parser",
+    "win": {
+      "target": "portable",
+      "icon": "build/icon.png"
+    }
   }
 }
