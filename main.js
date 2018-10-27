@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const parser = require('./src/index.js');
 
 let win;
@@ -22,3 +22,7 @@ app.on('ready', function() {
     console.log({res});
   });
 });
+
+// ipcMain.on('query', function (event, value) {
+//   console.log(value);
+// });

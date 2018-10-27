@@ -109,11 +109,9 @@ const init = async () => {
         ...paging,
     ];
     buildReport(preparedExcel, lists);
-    return 'FINAL';
+    // const ipcRenderer = require('electron').ipcRenderer;
+    // const value = 'FINAL';
+    // ipcRenderer.send('query', value);
 }
 
-init().then(res => {
-    console.warn({res});
-    return res;
-
-});
+init();
