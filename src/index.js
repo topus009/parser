@@ -46,6 +46,7 @@ const paging = [
 ];
 
 const init = async () => {
+    console.log('START');
     const {load, JSON_load} = helpers;
     // ================= full ==============================
     const full_promises = [];
@@ -108,6 +109,11 @@ const init = async () => {
         ...paging,
     ];
     buildReport(preparedExcel, lists);
+    return 'FINAL';
 }
 
-init();
+init().then(res => {
+    console.warn({res});
+    return res;
+
+});

@@ -7,10 +7,6 @@ const baseOptions = uri => ({
   // proxy: 'http://nw-proxy.megafon.ru:3128',
   method: 'GET',
   // strictSSL: false,
-  // tunnel: true,
-  // timeout: 10000,
-  // pool: {maxSockets: Infinity},
-  // resolveWithFullResponse: true,
 });
 
 const parseHTMLOptions = {
@@ -32,7 +28,7 @@ const parseJSONOptions = {
 };
 
 const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt}) => {
-  const {selector, model, prepareData} = script;
+  const {selector, model, prepareData, afterFilter} = script;
   const preparedResult = {};
   let $ = null;
   if(json) {
@@ -52,7 +48,11 @@ const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt})
     _.each(model, (path, index) => {
       preparedResult[index] = prepareData(itemInBody, index, path, uri);
     });
-    return preparedResult;
+    if(afterFilter) {
+      return afterFilter(preparedResult);
+    } else {
+      return preparedResult;
+    }
   }
 };
 

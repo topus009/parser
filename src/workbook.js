@@ -113,7 +113,9 @@ const buildReport = (data, lists) => {
     addHeader(sheet, title, colsCount);
     addTableHeader(sheet, lists);
     addTable(sheet, data, lists);
-    workbook.xlsx.writeFile(`${title}.xlsx`);
+    // workbook.xlsx.writeFile(`${title}.xlsx`);
+    workbook.xlsx.writeFile(`../${title}.xlsx`);
+    console.log('DONE');
 }
 //================== heplers =================
 function mergeCells(sheet, cellsRangeMap) {
@@ -121,20 +123,6 @@ function mergeCells(sheet, cellsRangeMap) {
         sheet.mergeCells(range[0], range[1]);
     });
 }
-
-// function fillCelsBG(sheet, cells, colors) {
-//     const baseFillOptions = {
-//         type: 'pattern',
-//         pattern: 'solid'
-//     };
-//     eachCell(sheet, cells, (cell, cellIndex) => {
-//         const color = colors[cellIndex];
-//         cell.fill = {
-//             ...baseFillOptions,
-//             fgColor: {argb: color}
-//         };
-//     });
-// }
 
 function setCellBorder(sheet, cells, style, sides) {
     const obj = {};

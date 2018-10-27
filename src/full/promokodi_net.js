@@ -29,8 +29,23 @@ const prepareData = (item, index, path) => {
     return result;
 }
 
+const afterFilter = prevData => {
+    const newData = {};
+    _.each(['title', 'value', 'format'], name => {
+        newData[name] = [];
+        _.each(prevData[name], (v, i) => {
+            newData[name][i] = v;
+            if(!v) {
+                newData[name][i] = '';
+            }
+        });
+    });
+    return newData;
+}
+
 module.exports = {
     selector,
     model,
-    prepareData
+    prepareData,
+    afterFilter,
 }

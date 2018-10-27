@@ -1,25 +1,18 @@
 const _ = require('lodash');
 const helpers = require('./helpers');
 
-const sortIndexedData = ({splittedData, prepared_megafon}) => {
+const sortIndexedData = splittedData => {
     const shopsTitles = {};
     const {normalizeTitle} = helpers;
-    _.each(splittedData, (item, itemIndex) => {
-        _.each(item.title, (title, titleIndex) => {
+    _.forOwn(splittedData, (item, itemIndex) => {
+        _.forOwn(item.title, title => {
             if(!shopsTitles[normalizeTitle(title)]) {
                 shopsTitles[normalizeTitle(title)] = [];
             }
+        });
+        _.forOwn(item.title, (title, titleIndex) => {
             shopsTitles[normalizeTitle(title)][itemIndex] = item.value[titleIndex];
         });
-    });
-    _.each(prepared_megafon, (item, title) => {
-        const {format, value} = item;
-        const formatted_value = `${value}${format}`;
-        if(shopsTitles[title]) {
-            shopsTitles[title].unshift(formatted_value);
-        } else {
-            shopsTitles[title] = [formatted_value];
-        }
     });
     return shopsTitles;
 }
@@ -62,31 +55,22 @@ const findMaxValue = data => {
 const splitData = prevData => {
     const newData = {};
     _.each(prevData, (item, index) => {
-        let result = item;
-        if(item.format) {
-            const {format, value} = item;
-            const newFormat = _.map(format, f => {
-                if(!f) return '';
-                return f;
-            });
-            const newValue = _.map(value, v => {
-                if(!v) return '';
-                return v;
-            });
-            const composedValue = _.map(newFormat, (f, i) => {
-                return `${newValue[i]} ${f}`
-            });
-            result = {
-                title: item.title,
-                value: composedValue
-            };
-        }
+        let result = {};
+        const {format, value, title} = item;
+        const newValue = _.map(title, (t, i) => {
+            const f = format && format[i] ? format[i] : '';
+            return `${value[i]}${f}`;
+        });
+        result = {
+            title,
+            value: newValue
+        };
         newData[index] = result;
     });
     return newData;
 }
 
-const combineRes = ({fullRes, pagingRes}) => {
+const combineRes = ({fullRes, pagingRes, prepared_megafon}) => {
     const preparedPagingRes = [];
     _.each(pagingRes, item => {
         const itemData = {
@@ -106,14 +90,23 @@ const combineRes = ({fullRes, pagingRes}) => {
         });
         preparedPagingRes.push(itemData);
     });
-    const combinedData = [...fullRes, ...preparedPagingRes];
-    return combinedData;
+    const megafonData = {
+        title: [],
+        format: [],
+        value: []
+    };
+    _.forIn(prepared_megafon, (v, k) => {
+        megafonData.title.push(k);
+        megafonData.format.push(v.format);
+        megafonData.value.push(v.value);
+    });
+    return [megafonData, ...fullRes, ...preparedPagingRes];
 }
 
 const prepareExcel = ({prepared_megafon, fullRes, pagingRes}) => {
-    const combinedData = combineRes({fullRes, pagingRes});
+    const combinedData = combineRes({fullRes, pagingRes, prepared_megafon});
     const splittedData = splitData(combinedData);
-    const sortedIndexedData = sortIndexedData({splittedData, prepared_megafon});
+    const sortedIndexedData = sortIndexedData(splittedData);
     const sortedTitleData = _.sortBy(
         _.map(sortedIndexedData, (item, index) => {
             const value = _.map(item, val => {
