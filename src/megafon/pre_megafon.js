@@ -25,11 +25,11 @@ const generateRequestLinks = categories => {
     });
 };
 
-const loadPreRequest = async () => {
+const loadPreRequest = async (contents) => {
     const {JSON_load} = helpers;
-    const allMegafonShops = await JSON_load({uri});
+    const allMegafonShops = await JSON_load({uri, contents});
     countPages(allMegafonShops);
     return _.flatten(generateRequestLinks(allMegafonShops.categories));
 };
 
-module.exports = {loadPreRequest}
+module.exports = loadPreRequest

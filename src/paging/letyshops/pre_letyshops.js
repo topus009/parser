@@ -8,7 +8,7 @@ const getLastPage = content => {
     return lastPage;
 };
 
-const loadPreRequest = async ({uri, title}) => {
+const loadPreRequest = async ({uri, title, contents}) => {
     const {pre_load_links} = helpers;
     const newUrl = page => `${uri}?page=${page}`;
     return {
@@ -16,7 +16,8 @@ const loadPreRequest = async ({uri, title}) => {
             uri,
             selector: 'ul.b-pagination.js-pagination',
             getLastPage,
-            newUrl
+            newUrl,
+            contents
         })
     };
 };

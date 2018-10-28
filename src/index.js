@@ -45,23 +45,23 @@ const paging = [
     },
 ];
 
-const init = async () => {
+const init = async (contents) => {
     console.log('START');
-    const {load, JSON_load} = helpers;
+    const {load, JSON_load, finish} = helpers;
     // ================= full ==============================
     const full_promises = [];
     _.forEach(full, item => {
         const {fileName, ...rest} = item;
         const script = files.full[fileName];
-        full_promises.push(load({script, ...rest}));
+        full_promises.push(load({script, ...rest, contents}));
     });
     const fullRes = await Promise.all(full_promises);
     // ================= full-end ==========================
     // ================= megafon ===========================
     const megafon_promises = [];
-    const megafon_links = await pre_megafon.loadPreRequest();
+    const megafon_links = await pre_megafon(contents);
     _.forEach(megafon_links, uri => {
-        megafon_promises.push(JSON_load({uri}));
+        megafon_promises.push(JSON_load({uri, contents}));
     });
     const megafonRes = await Promise.all(megafon_promises);
     const prepared_megafon = megafon(megafonRes);
@@ -71,7 +71,7 @@ const init = async () => {
     const paging_promises = {};
     _.forEach(paging, ({fileName, uri}) => {
         const {pre_load} = files.paging[fileName];
-        paging_pre_promises.push(pre_load({uri, title: fileName}));
+        paging_pre_promises.push(pre_load({uri, title: fileName, contents}));
     });
     const paging_links = await Promise.all(paging_pre_promises);
     for(const item of paging) {
@@ -85,7 +85,7 @@ const init = async () => {
             if(shopLinks) {
                 paging_promises[fileName] = [];
                 for(const uri of shopLinks) {
-                    paging_promises[fileName].push(load({script, prefilter, ...rest, uri}));
+                    paging_promises[fileName].push(load({script, prefilter, ...rest, uri, contents}));
                 }
             }
         }
@@ -109,9 +109,7 @@ const init = async () => {
         ...paging,
     ];
     buildReport(preparedExcel, lists);
-    // const ipcRenderer = require('electron').ipcRenderer;
-    // const value = 'FINAL';
-    // ipcRenderer.send('query', value);
+    finish(contents, 'ОТЧЕТ ГОТОВ');
 }
 
-init();
+module.exports = init;

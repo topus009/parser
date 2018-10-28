@@ -1,28 +1,39 @@
+const path = require('path');
+const url = require('url');
 const {app, BrowserWindow, ipcMain} = require('electron');
 const parser = require('./src/index.js');
 
-let win;
+let mainWindow = null;
 
-app.on('window-all-closed', function() {
-  if (process.platform != 'darwin')
-    app.quit();
+function createWindow() {
+    mainWindow = new BrowserWindow({width: 800, height: 600});
+    mainWindow.loadURL(url.format({
+      pathname: path.join(__dirname, './app.html'),
+      protocol: 'file:',
+      slashes: true
+  }));
+//   mainWindow.webContents.openDevTools();
+  mainWindow.webContents.on('did-finish-load', async () => {
+    await parser(mainWindow.webContents);
+  });
+
+  ipcMain.on('FINISH', function (event, target) {
+    event.sender.send('FINISH_DATA', target);
+  });
+
+  mainWindow.on('closed', () => {
+      mainWindow = null;
+  });
+}
+app.on('ready', createWindow);
+app.on('window-all-closed', () => {
+    if(process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
-app.on('ready', function() {
-  win = new BrowserWindow({
-    width: 800,
-    height: 600
-  });
-  let contents = win.webContents;
-  contents.openDevTools();
-  win.on('closed', function() {
-    win = null;
-  });
-  contents.executeJavaScript(parser).then(res => {
-    console.log({res});
-  });
+app.on('activate', () => {
+    if(mainWindow === null) {
+        createWindow();
+    }
 });
-
-// ipcMain.on('query', function (event, value) {
-//   console.log(value);
-// });

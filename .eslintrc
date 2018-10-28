@@ -1,0 +1,27 @@
+{
+	"env": {
+		"node": true,
+        "browser": true,
+        "es6": true
+	},
+	"rules": {
+		"no-multiple-empty-lines": [2, {"max": 1}],
+        "quotes": [2, "single", "avoid-escape"],
+        "no-undef": "error",
+        "no-console": "off"
+    },
+    "parserOptions": {
+        "ecmaVersion": 8,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "experimentalObjectRestSpread": true
+        }
+    },
+    "overrides": [
+        {
+          "files": [ "src/*.js"],
+          "excludedFiles": "main.js"
+        }
+      ],
+      "extends": "eslint:recommended"
+}

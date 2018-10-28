@@ -113,7 +113,6 @@ const buildReport = (data, lists) => {
     addHeader(sheet, title, colsCount);
     addTableHeader(sheet, lists);
     addTable(sheet, data, lists);
-    // workbook.xlsx.writeFile(`${title}.xlsx`);
     workbook.xlsx.writeFile(`../${title}.xlsx`);
     console.log('DONE');
 }
