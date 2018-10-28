@@ -8,6 +8,10 @@
   },
   "main": "main.js",
   "author": "sergey.topolov",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:topus009/parser.git"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "exceljs": "^1.6.2",
