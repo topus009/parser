@@ -5,7 +5,7 @@ const prefilter = data => {
         const trash = _.get(item, 'children[1].children[3].children[0].data');
         if(trash !== 'Кэшбэк 2x' && trash !== 'Акция') {
             return item;
-        };
+        }
     });
     return _.compact(prefilteredData);
 }

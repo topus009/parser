@@ -45,11 +45,14 @@ const paging = [
     },
 ];
 
-const init = async (contents) => {
+const init = async contents => {
     console.log('START');
     const {load, JSON_load, finish} = helpers;
-    // ================= full ==============================
     const full_promises = [];
+    const megafon_promises = [];
+    const paging_pre_promises = [];
+    const paging_promises = {};
+    // ================= full ==============================
     _.forEach(full, item => {
         const {fileName, ...rest} = item;
         const script = files.full[fileName];
@@ -58,7 +61,6 @@ const init = async (contents) => {
     const fullRes = await Promise.all(full_promises);
     // ================= full-end ==========================
     // ================= megafon ===========================
-    const megafon_promises = [];
     const megafon_links = await pre_megafon(contents);
     _.forEach(megafon_links, uri => {
         megafon_promises.push(JSON_load({uri, contents}));
@@ -67,8 +69,6 @@ const init = async (contents) => {
     const prepared_megafon = megafon(megafonRes);
     // ================= megafon-end =======================
     // ================= paging ============================
-    const paging_pre_promises = [];
-    const paging_promises = {};
     _.forEach(paging, ({fileName, uri}) => {
         const {pre_load} = files.paging[fileName];
         paging_pre_promises.push(pre_load({uri, title: fileName, contents}));
@@ -101,14 +101,14 @@ const init = async (contents) => {
         fullRes,
         pagingRes,
     });
-    const lists = [
+    const list = [
         {
             fileName: 'megafon'
         },
         ...full,
         ...paging,
     ];
-    buildReport(preparedExcel, lists);
+    buildReport(preparedExcel, list);
     finish(contents, 'ОТЧЕТ ГОТОВ');
 }
 
