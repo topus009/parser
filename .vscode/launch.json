@@ -13,7 +13,10 @@
             ],
             "showAsyncStacks": true,
             "protocol": "inspector",
-            "stopOnEntry": false
+            "stopOnEntry": false,
+            "env": {
+                "NODE_ENV": "debug"
+            }
         }
     ]
 }

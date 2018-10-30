@@ -112,4 +112,9 @@ const init = async contents => {
     finish(contents, 'ОТЧЕТ ГОТОВ');
 }
 
+if(process.env === 'debug') {
+    console.log('mode ===> debug');
+    init();
+}
+
 module.exports = init;
