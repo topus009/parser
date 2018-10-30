@@ -12,15 +12,15 @@ const prepareData = data => {
     const partners_with_values = {};
     _.each(indexed_partners, (partner, index) => {
         const {cashback_variants} = partner;
-        const target_variant = _.maxBy(cashback_variants, el => +el.client_amount);
-        const {cashback_type, client_amount} = target_variant;
+        const target_variant = _.maxBy(cashback_variants, el => +el.increased_client_amount);
+        const {cashback_type, increased_client_amount} = target_variant;
         let format_symbol = '';
         if(cashback_type === 'percent') {
             format_symbol = '%';
         }
         partners_with_values[normalizeTitle(index)] = {
             format: format_symbol,
-            value: client_amount
+            value: increased_client_amount
         };
     });
     return partners_with_values;
