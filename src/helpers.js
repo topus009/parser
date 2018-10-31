@@ -82,11 +82,14 @@ const HTML_load = async ({uri, opt, contents}) => {
 
 const normalizeTitle = title => {
   const regex1 = /-ru|-com$|([ .])([a-zа-я]{0,3})$/ig;
-  const regex2 = /([ .'`’-]{1,2})/g;
+  const regex2 = /([ .'_`’-]{1,2})/g;
   return title.toLowerCase()
     .replace(regex1, '')
     .replace(regex2, '');
 };
+
+const parseNumber = val => parseFloat(val.replace(/([A-ZА-Я ])/ig, ''));
+const parseFormat = val => val.replace(/(\d{1,}[., ]{0,}\d{0,}[ ]{0,})/ig, '').trim();
 
 module.exports = {
   load,
@@ -96,5 +99,7 @@ module.exports = {
   parseJSONOptions,
   normalizeTitle,
   pre_load_links,
-  finish
+  finish,
+  parseNumber,
+  parseFormat
 }

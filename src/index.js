@@ -43,6 +43,11 @@ const paging = [
         uri: 'https://letyshops.com/shops',
         json: false
     },
+    {
+        fileName: 'epn',
+        uri: 'https://epn.bz/ru/cashback/shops',
+        json: false
+    },
 ];
 
 const init = async (contents, second_title) => {

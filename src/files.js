@@ -6,6 +6,7 @@ const shopingbox = require('./full/shopingbox');
 const cashback_ru = require('./full/cashback_ru');
 // paging
 const letyshops = require('./paging/letyshops');
+const epn = require('./paging/epn');
 
 module.exports = {
     full: {
@@ -17,5 +18,6 @@ module.exports = {
     },
     paging: {
         letyshops,
+        epn,
     }
 }
