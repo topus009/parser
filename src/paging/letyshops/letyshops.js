@@ -38,7 +38,6 @@ const prepareData = (item, index, path, uri) => {
                 console.log('+++++++++++++++');
                 console.log({xxx});
                 console.log({spans});
-                console.log({values});
                 console.log({section2});
                 console.log({pathEl});
                 console.log({item});

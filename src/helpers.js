@@ -66,6 +66,7 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
 
 const finish = (contents, target) => {
   contents.send('FINISH_DATA', target);
+  // console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {

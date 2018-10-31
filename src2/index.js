@@ -75,20 +75,24 @@ const init = async (contents, second_title) => {
         pagingRes[site] = siteRes;
     }
     // ================= paging-end ========================
-    const preparedExcel = prepareExcel({
-        prepared_megafon,
-        fullRes,
-        pagingRes,
-    });
-    const list = [
-        {
-            fileName: 'megafon'
-        },
-        ...full,
-        ...paging,
-    ];
-    buildReport(preparedExcel, list, second_title);
-    finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+    try {
+        const preparedExcel = prepareExcel({
+            prepared_megafon,
+            fullRes,
+            pagingRes,
+        });
+        const list = [
+            {
+                fileName: 'megafon'
+            },
+            ...full,
+            ...paging,
+        ];
+        buildReport(preparedExcel, list, second_title);
+        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+    } catch (error) {
+        finish(contents, 222222222222222222222222222222222, error);
+    }
 }
 
 module.exports = init;

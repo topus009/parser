@@ -13,7 +13,7 @@ function createWindow() {
       protocol: 'file:',
       slashes: true
   }));
-//   mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   mainWindow.webContents.on('did-finish-load', async () => {
     await parser1(mainWindow.webContents, '(обычный)');
     await parser2(mainWindow.webContents, '(повышенный)');

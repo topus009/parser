@@ -7,29 +7,29 @@ const pre_megafon = require('./megafon/pre_megafon');
 const megafon = require('./megafon/megafon');
 
 const full = [
-    {
-        fileName: 'kopikot',
-        uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
-        json: true,
-        extendedRequestOptions: {
-            headers: {'x-bonusway-locale': 'ru'}
-        }
-    },
-    {
-        fileName: 'promokodi_net',
-        uri: 'https://promokodi.net/store/cashback/',
-        json: false
-    },
-    {
-        fileName: 'simplybestcoupons',
-        uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
-        json: false
-    },
-    {
-        fileName: 'shopingbox',
-        uri: 'http://shopingbox.ru/box/all/',
-        json: false
-    },
+    // {
+    //     fileName: 'kopikot',
+    //     uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
+    //     json: true,
+    //     extendedRequestOptions: {
+    //         headers: {'x-bonusway-locale': 'ru'}
+    //     }
+    // },
+    // {
+    //     fileName: 'promokodi_net',
+    //     uri: 'https://promokodi.net/store/cashback/',
+    //     json: false
+    // },
+    // {
+    //     fileName: 'simplybestcoupons',
+    //     uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
+    //     json: false
+    // },
+    // {
+    //     fileName: 'shopingbox',
+    //     uri: 'http://shopingbox.ru/box/all/',
+    //     json: false
+    // },
     {
         fileName: 'cashback_ru',
         uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
@@ -43,11 +43,11 @@ const paging = [
         uri: 'https://letyshops.com/shops',
         json: false
     },
-    {
-        fileName: 'epn',
-        uri: 'https://epn.bz/ru/cashback/shops',
-        json: false
-    },
+    // {
+    //     fileName: 'epn',
+    //     uri: 'https://epn.bz/ru/cashback/shops',
+    //     json: false
+    // },
 ];
 
 const init = async (contents, second_title) => {
@@ -100,20 +100,29 @@ const init = async (contents, second_title) => {
         pagingRes[site] = siteRes;
     }
     // ================= paging-end ========================
-    const preparedExcel = prepareExcel({
-        prepared_megafon,
-        fullRes,
-        pagingRes,
-    });
-    const list = [
-        {
-            fileName: 'megafon'
-        },
-        ...full,
-        ...paging,
-    ];
-    buildReport(preparedExcel, list, second_title);
-    finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+    try {
+        const preparedExcel = prepareExcel({
+            prepared_megafon,
+            fullRes,
+            pagingRes,
+        });
+        const list = [
+            {
+                fileName: 'megafon'
+            },
+            ...full,
+            ...paging,
+        ];
+        buildReport(preparedExcel, list, second_title);
+        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        // buildReport(preparedExcel, list, '(обычный)');
+        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+    } catch (error) {
+        finish(contents, 11111111111111111111111111, error);
+    }
+
 }
+
+// init();
 
 module.exports = init;
