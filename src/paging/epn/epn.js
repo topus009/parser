@@ -24,7 +24,18 @@ const prepareData = (item, index, path, uri) => {
             });
             break;
         case 'value':
-            result = _.map(item, el => helpers.parseNumber(_.get(el, path)));
+            const labels = _.map(item, el => helpers.parseNumber(_.get(el, path)));
+            const prefixes = _.map(item, el => {
+                const text = _.get(el, 'children[5].children[1].children[0].data');
+                return text.replace('кэшбэк ', '').trim();
+            });
+            result = _.map(labels, (val, ind) => {
+                const targetPrefix = prefixes[ind];
+                if(targetPrefix) {
+                    return `${targetPrefix} ${val}`;
+                }
+                return val;
+            });
             break;
         default:
             console.log('EPN.BZ = НИЧЕГО НЕ НАЙДЕНО')
