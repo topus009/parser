@@ -2,7 +2,7 @@ const path = require('path');
 const url = require('url');
 const {app, BrowserWindow, ipcMain} = require('electron');
 const parser1 = require('./src/index.js');
-const parser2 = require('./src2/index.js');
+// const parser2 = require('./src2/index.js');
 
 let mainWindow = null;
 
@@ -16,7 +16,7 @@ function createWindow() {
   mainWindow.webContents.openDevTools();
   mainWindow.webContents.on('did-finish-load', async () => {
     await parser1(mainWindow.webContents, '(обычный)');
-    await parser2(mainWindow.webContents, '(повышенный)');
+    // await parser2(mainWindow.webContents, '(повышенный)');
   });
 
   ipcMain.on('FINISH', function (event, target) {

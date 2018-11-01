@@ -4,9 +4,9 @@ const rp = require('request-promise');
 
 const baseOptions = uri => ({
   uri: uri,
-  // proxy: 'http://nw-proxy.megafon.ru:3128',
+  proxy: 'http://nw-proxy.megafon.ru:3128',
   method: 'GET',
-  // strictSSL: false,
+  strictSSL: false,
 });
 
 const parseHTMLOptions = {
@@ -31,28 +31,32 @@ const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt, 
   const {selector, model, prepareData, afterFilter} = script;
   const preparedResult = {};
   let $ = null;
-  if(json) {
-    $ = await JSON_load({uri, opt, contents});
-    _.each(model, (path, index) => {
-      preparedResult[index] = prepareData($, selector, index, path, uri);
-    });
-    return preparedResult;
-  } else {
-    $ = await HTML_load({uri, opt, contents});
-    let itemInBody = null;
-    if(prefilter) {
-      itemInBody = prefilter($(selector));
-    } else {
-      itemInBody = $(selector);
-    }
-    _.each(model, (path, index) => {
-      preparedResult[index] = prepareData(itemInBody, index, path, uri);
-    });
-    if(afterFilter) {
-      return afterFilter(preparedResult);
-    } else {
+  try {
+    if(json) {
+      $ = await JSON_load({uri, opt, contents});
+      _.each(model, (path, index) => {
+        preparedResult[index] = prepareData($, selector, index, path, uri);
+      });
       return preparedResult;
+    } else {
+      $ = await HTML_load({uri, opt, contents});
+      let itemInBody = null;
+      if(prefilter) {
+        itemInBody = prefilter($(selector));
+      } else {
+        itemInBody = $(selector);
+      }
+      _.each(model, (path, index) => {
+        preparedResult[index] = prepareData(itemInBody, index, path, uri);
+      });
+      if(afterFilter) {
+        return afterFilter(preparedResult);
+      } else {
+        return preparedResult;
+      }
     }
+  } catch (error) {
+    finish(contents, '11111-helpers', error);
   }
 };
 
@@ -65,8 +69,8 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
 };
 
 const finish = (contents, target) => {
-  contents.send('FINISH_DATA', target);
-  // console.log('FINISH_DATA', target)
+  // contents.send('FINISH_DATA', target);
+  console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {

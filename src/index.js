@@ -25,29 +25,34 @@ const full = [
     //     uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
     //     json: false
     // },
-    // {
-    //     fileName: 'shopingbox',
-    //     uri: 'http://shopingbox.ru/box/all/',
-    //     json: false
-    // },
     {
-        fileName: 'cashback_ru',
-        uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
+        fileName: 'shopingbox',
+        uri: 'http://shopingbox.ru/box/all/',
         json: false
     },
+    // {
+    //     fileName: 'cashback_ru',
+    //     uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
+    //     json: false
+    // },
 ];
 
 const paging = [
-    {
-        fileName: 'letyshops',
-        uri: 'https://letyshops.com/shops',
-        json: false
-    },
+    // {
+    //     fileName: 'letyshops',
+    //     uri: 'https://letyshops.com/shops',
+    //     json: false
+    // },
     // {
     //     fileName: 'epn',
     //     uri: 'https://epn.bz/ru/cashback/shops',
     //     json: false
     // },
+    {
+        fileName: 'beback',
+        uri: 'https://beback.ru/site/retailers',
+        json: false
+    },
 ];
 
 const init = async (contents, second_title) => {
@@ -113,16 +118,16 @@ const init = async (contents, second_title) => {
             ...full,
             ...paging,
         ];
-        buildReport(preparedExcel, list, second_title);
-        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
-        // buildReport(preparedExcel, list, '(обычный)');
-        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+        // buildReport(preparedExcel, list, second_title);
+        // finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        buildReport(preparedExcel, list, '(обычный)');
+        finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
-        finish(contents, 11111111111111111111111111, error);
+        finish(contents, '11111-index', error);
     }
 
 }
 
-// init();
+init();
 
 module.exports = init;

@@ -91,7 +91,7 @@ const init = async (contents, second_title) => {
         buildReport(preparedExcel, list, second_title);
         finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
     } catch (error) {
-        finish(contents, 222222222222222222222222222222222, error);
+        finish(contents, '11111-index', error);
     }
 }
 
