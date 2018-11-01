@@ -4,9 +4,9 @@ const rp = require('request-promise');
 
 const baseOptions = uri => ({
   uri: uri,
-  proxy: 'http://nw-proxy.megafon.ru:3128',
+  // proxy: 'http://nw-proxy.megafon.ru:3128',
   method: 'GET',
-  strictSSL: false,
+  // strictSSL: false,
 });
 
 const parseHTMLOptions = {
