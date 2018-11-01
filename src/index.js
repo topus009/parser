@@ -6,48 +6,48 @@ const buildReport = require('./workbook');
 const pre_megafon = require('./megafon/pre_megafon');
 const megafon = require('./megafon/megafon');
 
-// const full = [
-//     // {
-//     //     fileName: 'kopikot',
-//     //     uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
-//     //     json: true,
-//     //     extendedRequestOptions: {
-//     //         headers: {'x-bonusway-locale': 'ru'}
-//     //     }
-//     // },
-//     // {
-//     //     fileName: 'promokodi_net',
-//     //     uri: 'https://promokodi.net/store/cashback/',
-//     //     json: false
-//     // },
-//     // {
-//     //     fileName: 'simplybestcoupons',
-//     //     uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
-//     //     json: false
-//     // },
-//     {
-//         fileName: 'shopingbox',
-//         uri: 'http://shopingbox.ru/box/all/',
-//         json: false
-//     },
-//     // {
-//     //     fileName: 'cashback_ru',
-//     //     uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
-//     //     json: false
-//     // },
-// ];
+const full = [
+    {
+        fileName: 'kopikot',
+        uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
+        json: true,
+        extendedRequestOptions: {
+            headers: {'x-bonusway-locale': 'ru'}
+        }
+    },
+    {
+        fileName: 'promokodi_net',
+        uri: 'https://promokodi.net/store/cashback/',
+        json: false
+    },
+    {
+        fileName: 'simplybestcoupons',
+        uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
+        json: false
+    },
+    {
+        fileName: 'shopingbox',
+        uri: 'http://shopingbox.ru/box/all/',
+        json: false
+    },
+    {
+        fileName: 'cashback_ru',
+        uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
+        json: false
+    },
+];
 
 const paging = [
-    // {
-    //     fileName: 'letyshops',
-    //     uri: 'https://letyshops.com/shops',
-    //     json: false
-    // },
-    // {
-    //     fileName: 'epn',
-    //     uri: 'https://epn.bz/ru/cashback/shops',
-    //     json: false
-    // },
+    {
+        fileName: 'letyshops',
+        uri: 'https://letyshops.com/shops',
+        json: false
+    },
+    {
+        fileName: 'epn',
+        uri: 'https://epn.bz/ru/cashback/shops',
+        json: false
+    },
     {
         fileName: 'cashmeback',
         uri: 'https://cashmeback.ru/catalog',
@@ -62,20 +62,20 @@ const init = async (contents, second_title) => {
     const paging_pre_promises = [];
     const paging_promises = {};
     // ================= full ==============================
-    // _.forEach(full, item => {
-    //     const {fileName, ...rest} = item;
-    //     const script = files.full[fileName];
-    //     full_promises.push(load({script, ...rest, contents}));
-    // });
-    // const fullRes = await Promise.all(full_promises);
+    _.forEach(full, item => {
+        const {fileName, ...rest} = item;
+        const script = files.full[fileName];
+        full_promises.push(load({script, ...rest, contents}));
+    });
+    const fullRes = await Promise.all(full_promises);
     // ================= full-end ==========================
     // ================= megafon ===========================
-    // const megafon_links = await pre_megafon(contents);
-    // _.forEach(megafon_links, uri => {
-    //     megafon_promises.push(JSON_load({uri, contents}));
-    // });
-    // const megafonRes = await Promise.all(megafon_promises);
-    // const prepared_megafon = megafon(megafonRes);
+    const megafon_links = await pre_megafon(contents);
+    _.forEach(megafon_links, uri => {
+        megafon_promises.push(JSON_load({uri, contents}));
+    });
+    const megafonRes = await Promise.all(megafon_promises);
+    const prepared_megafon = megafon(megafonRes);
     // ================= megafon-end =======================
     // ================= paging ============================
     _.forEach(paging, ({fileName, uri}) => {
@@ -107,8 +107,8 @@ const init = async (contents, second_title) => {
     // ================= paging-end ========================
     try {
         const preparedExcel = prepareExcel({
-            // prepared_megafon,
-            // fullRes,
+            prepared_megafon,
+            fullRes,
             pagingRes,
         });
         const list = [
@@ -118,16 +118,16 @@ const init = async (contents, second_title) => {
             ...full,
             ...paging,
         ];
-        // buildReport(preparedExcel, list, second_title);
-        // finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
-        buildReport(preparedExcel, list, '(обычный)');
-        finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+        buildReport(preparedExcel, list, second_title);
+        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        // buildReport(preparedExcel, list, '(обычный)');
+        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
         finish(contents, '11111-index', error);
     }
 
 }
 
-init();
+// init();
 
 module.exports = init;
