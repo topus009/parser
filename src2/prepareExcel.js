@@ -28,7 +28,7 @@ const findMaxValue = data => {
                         comparedValues[index].push(
                             {
                                 position: ind,
-                                value: parseFloat(val.replace(/([A-ZА-Я ])/ig, '')),
+                                value: helpers.parseNumber(val),
                                 title: item.title
                             }
                         );

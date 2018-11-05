@@ -56,7 +56,7 @@ const paging = [
 ];
 
 const init = async (contents, second_title) => {
-    const {load, JSON_load, finish} = helpers;
+    const {load, JSON_load, finish, findFailedUrlsIndexes} = helpers;
     const full_promises = [];
     const megafon_promises = [];
     const paging_pre_promises = [];
@@ -106,17 +106,23 @@ const init = async (contents, second_title) => {
     }
     // ================= paging-end ========================
     try {
+        const {
+            fullRes_filtered,
+            pagingRes_filtered,
+            fullRes_indexes,
+        } = findFailedUrlsIndexes({fullRes, pagingRes});
+        const filteredFinalPagingRes = _.filter(pagingRes_filtered, site => site.length);
         const preparedExcel = prepareExcel({
             prepared_megafon,
-            fullRes,
-            pagingRes,
+            fullRes: fullRes_filtered,
+            pagingRes: filteredFinalPagingRes,
         });
         const list = [
             {
                 fileName: 'megafon'
             },
-            ...full,
-            ...paging,
+            ..._.filter(full, (value, key) => !_.includes(fullRes_indexes, key)),
+            ..._.filter(paging, (site, key) => filteredFinalPagingRes[key]),
         ];
         buildReport(preparedExcel, list, second_title);
         finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);

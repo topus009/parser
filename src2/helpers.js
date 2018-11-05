@@ -70,6 +70,7 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
 
 const finish = (contents, target) => {
   contents.send('FINISH_DATA', target);
+  // console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {
@@ -86,11 +87,52 @@ const HTML_load = async ({uri, opt, contents}) => {
 
 const normalizeTitle = title => {
   const regex1 = /-ru|-com$|([ .])([a-zа-я]{0,3})$/ig;
-  const regex2 = /([ .'`’-]{1,2})/g;
+  const regex2 = /([ .'_`’-]{1,2})/g;
   return title.toLowerCase()
     .replace(regex1, '')
     .replace(regex2, '');
 };
+
+const parseNumber = val => parseFloat(val.replace(/([A-ZА-Я ])/ig, ''));
+
+const parseFormat = val => val.replace(/(\d{1,}[., ]{0,}\d{0,}[ ]{0,})/ig, '').trim();
+
+const findFailedUrlsIndexes = ({
+  fullRes,
+  pagingRes,
+}) => {
+  const pagingRes_indexes = {};
+  const pagingRes_filtered = {};
+  try {
+    const fullRes_indexes = _.compact(_.map(fullRes, (value, key) => !value && key));
+    const fullRes_filtered = _.filter(fullRes, (value, key) => !_.includes(fullRes_indexes, key));
+    _.each(pagingRes, (value, shop) => {
+      pagingRes_indexes[shop] = [];
+      _.each(value, (urlValue, key) => {
+        if(!urlValue) {
+          pagingRes_indexes[shop].push(key);
+        }
+      });
+    });
+    _.each(pagingRes, (value, shop) => {
+      pagingRes_filtered[shop] = [];
+      _.each(value, urlValue => {
+        if(urlValue) {
+          pagingRes_filtered[shop].push(urlValue);
+        }
+      });
+    });
+    return {
+      fullRes_filtered,
+      pagingRes_filtered,
+      fullRes_indexes,
+      pagingRes_indexes,
+    };
+  } catch (error) {
+    console.log('________________');
+    console.log({error});
+  }
+}
 
 module.exports = {
   load,
@@ -100,5 +142,8 @@ module.exports = {
   parseJSONOptions,
   normalizeTitle,
   pre_load_links,
-  finish
+  finish,
+  parseNumber,
+  parseFormat,
+  findFailedUrlsIndexes,
 }

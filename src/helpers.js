@@ -94,7 +94,45 @@ const normalizeTitle = title => {
 };
 
 const parseNumber = val => parseFloat(val.replace(/([A-ZА-Я ])/ig, ''));
+
 const parseFormat = val => val.replace(/(\d{1,}[., ]{0,}\d{0,}[ ]{0,})/ig, '').trim();
+
+const findFailedUrlsIndexes = ({
+  fullRes,
+  pagingRes,
+}) => {
+  const pagingRes_indexes = {};
+  const pagingRes_filtered = {};
+  try {
+    const fullRes_indexes = _.compact(_.map(fullRes, (value, key) => !value && key));
+    const fullRes_filtered = _.filter(fullRes, (value, key) => !_.includes(fullRes_indexes, key));
+    _.each(pagingRes, (value, shop) => {
+      pagingRes_indexes[shop] = [];
+      _.each(value, (urlValue, key) => {
+        if(!urlValue) {
+          pagingRes_indexes[shop].push(key);
+        }
+      });
+    });
+    _.each(pagingRes, (value, shop) => {
+      pagingRes_filtered[shop] = [];
+      _.each(value, urlValue => {
+        if(urlValue) {
+          pagingRes_filtered[shop].push(urlValue);
+        }
+      });
+    });
+    return {
+      fullRes_filtered,
+      pagingRes_filtered,
+      fullRes_indexes,
+      pagingRes_indexes,
+    };
+  } catch (error) {
+    console.log('________________');
+    console.log({error});
+  }
+}
 
 module.exports = {
   load,
@@ -106,5 +144,6 @@ module.exports = {
   pre_load_links,
   finish,
   parseNumber,
-  parseFormat
+  parseFormat,
+  findFailedUrlsIndexes,
 }

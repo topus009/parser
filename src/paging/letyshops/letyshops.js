@@ -31,12 +31,13 @@ const prepareData = (item, index, path, uri) => {
     } else if(index === 'value') {
         const pathEl = el => valueFix(el) + path;
         const section2 = _.map(item, el => _.get(el, pathEl(el)));
-        const values = _.map(section2, sec => {
+        const values = _.map(section2, (sec, k2) => {
             const spans = _.filter(sec, {name: 'span'});
             const xxx = _.filter(spans, sp => sp.attribs.class.trim() === 'b-shop-teaser__cash')[0];
             if(xxx === undefined) {
                 console.log('+++++++++++++++');
                 console.log({xxx});
+                console.log({k2});
                 console.log({spans});
                 console.log({section2});
                 console.log({pathEl});
