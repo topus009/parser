@@ -57,7 +57,7 @@ const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt, 
       }
     }
   } catch (error) {
-    finish(contents, '11111-helpers', error);
+    finish(contents, '11111-helpers_load', error);
   }
 };
 
@@ -70,8 +70,8 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
 };
 
 const finish = (contents, target) => {
-  // contents.send('FINISH_DATA', target);
-  console.log('FINISH_DATA', target)
+  contents.send('FINISH_DATA', target);
+  // console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {

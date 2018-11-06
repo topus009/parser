@@ -99,7 +99,7 @@ const init = async (contents, second_title) => {
         // buildReport(preparedExcel, list, '(обычный)');
         // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
-        finish(contents, '11111-index', error);
+        finish(contents, '22222-index', error);
     }
 
 }

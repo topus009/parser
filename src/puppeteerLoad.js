@@ -7,10 +7,10 @@ function extractItems(selectors) {
     const valueItems = document.querySelectorAll(value);
     const items = [];
     for (let key in titleItems) {
-      items.push({
-              title: titleItems[key].innerText,
-              value: valueItems[key].innerText
-          });
+        items.push({
+            title: titleItems[key].innerText,
+            value: valueItems[key].innerText
+        });
     }
     return items;
 }
@@ -43,10 +43,10 @@ async function scrapeInfiniteScrollItems({
 
 const puppeteerLoad = async ({uri, nextSelector, selectors}) => {
     const browser = await puppeteer.launch({
-    headless: false,
-        args: [
-            '--disable-notifications',
-        ],
+    headless: true,
+        // args: [
+        //     '--disable-notifications',
+        // ],
         // devtools: true
     });
     const page = await browser.newPage();
@@ -60,8 +60,17 @@ const puppeteerLoad = async ({uri, nextSelector, selectors}) => {
         selectors,
     });
     await browser.close();
-    console.log({xxx: items});
-    return _.filter(items, item => !_.isEmpty(item));
+    // console.log({xxx: items});
+    const filteredItems = _.filter(items, item => !_.isEmpty(item));
+    const preparedItems = {
+        title: [],
+        value: [],
+    };
+    _.each(filteredItems, el => {
+        preparedItems.title.push(el.title);
+        preparedItems.value.push(el.value);
+    });
+    return preparedItems;
 }
 
 module.exports = puppeteerLoad;

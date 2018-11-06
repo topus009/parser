@@ -104,38 +104,42 @@ const combineRes = ({fullRes, pagingRes, prepared_megafon}) => {
 }
 
 const prepareExcel = ({prepared_megafon, fullRes, pagingRes}) => {
-    const combinedData = combineRes({fullRes, pagingRes, prepared_megafon});
-    const splittedData = splitData(combinedData);
-    const sortedIndexedData = sortIndexedData(splittedData);
-    const sortedTitleData = _.sortBy(
-        _.map(sortedIndexedData, (item, index) => {
-            const value = _.map(item, val => {
-                if(val) {
-                    return val.replace(/([,])/g, '.');
-                } return val;
-            });
-            return {
-                title: index,
-                value
-            };
-        }), 'title');
-    const maxValueIndexes = findMaxValue(sortedTitleData);
+    try {
+        const combinedData = combineRes({fullRes, pagingRes, prepared_megafon});
+        const splittedData = splitData(combinedData);
+        const sortedIndexedData = sortIndexedData(splittedData);
+        const sortedTitleData = _.sortBy(
+            _.map(sortedIndexedData, (item, index) => {
+                const value = _.map(item, val => {
+                    if(val) {
+                        return val.replace(/([,])/g, '.');
+                    } return val;
+                });
+                return {
+                    title: index,
+                    value
+                };
+            }), 'title');
+        const maxValueIndexes = findMaxValue(sortedTitleData);
 
-    const preparedExcel = _.map(sortedTitleData, (data, dataInd) => {
-        return {
-            title: data.title,
-            value: _.map(data.value, (val, ind) => {
-                if(data.value.length === 1) {
-                    return [val, true];
-                }
-                const targetColorPos = _.find(maxValueIndexes[dataInd], v => v === ind);
-                if(targetColorPos >= 0) {
-                    return [val, true];
-                } return [val, false];
-            })
-        };
-    });
-    return preparedExcel;
+        const preparedExcel = _.map(sortedTitleData, (data, dataInd) => {
+            return {
+                title: data.title,
+                value: _.map(data.value, (val, ind) => {
+                    if(data.value.length === 1) {
+                        return [val, true];
+                    }
+                    const targetColorPos = _.find(maxValueIndexes[dataInd], v => v === ind);
+                    if(targetColorPos >= 0) {
+                        return [val, true];
+                    } return [val, false];
+                })
+            };
+        });
+        return preparedExcel;
+    } catch (error) {
+        console.log({ERROR: error});
+    }
 }
 
 module.exports = prepareExcel;
