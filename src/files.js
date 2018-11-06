@@ -8,6 +8,8 @@ const cashback_ru = require('./full/cashback_ru');
 const letyshops = require('./paging/letyshops');
 const epn = require('./paging/epn');
 const cashmeback = require('./paging/cashmeback');
+// lazy
+const smarty_sale = require('./lazy/smarty_sale');
 
 module.exports = {
     full: {
@@ -21,5 +23,8 @@ module.exports = {
         letyshops,
         epn,
         cashmeback,
+    },
+    lazy: {
+        smarty_sale,
     }
 }

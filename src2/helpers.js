@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 const _ = require('lodash');
 const rp = require('request-promise');
+const puppeteerLoad = require('./puppeteerLoad');
 
 const baseOptions = uri => ({
   uri: uri,
@@ -69,8 +70,8 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
 };
 
 const finish = (contents, target) => {
-  contents.send('FINISH_DATA', target);
-  // console.log('FINISH_DATA', target)
+  // contents.send('FINISH_DATA', target);
+  console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {
@@ -81,6 +82,12 @@ const JSON_load = async ({uri, opt, contents}) => {
 
 const HTML_load = async ({uri, opt, contents}) => {
   const res = await rp({...baseOptions(uri), ...parseHTMLOptions, ...opt});
+  finish(contents, uri);
+  return res;
+};
+
+const LAZY_load = async ({uri, contents, nextSelector, selectors}) => {
+  const res = await puppeteerLoad({uri, nextSelector, selectors});
   finish(contents, uri);
   return res;
 };
@@ -97,10 +104,7 @@ const parseNumber = val => parseFloat(val.replace(/([A-ZА-Я ])/ig, ''));
 
 const parseFormat = val => val.replace(/(\d{1,}[., ]{0,}\d{0,}[ ]{0,})/ig, '').trim();
 
-const findFailedUrlsIndexes = ({
-  fullRes,
-  pagingRes,
-}) => {
+const findFailedUrlsIndexes = ({fullRes, pagingRes}) => {
   const pagingRes_indexes = {};
   const pagingRes_filtered = {};
   try {
@@ -146,4 +150,5 @@ module.exports = {
   parseNumber,
   parseFormat,
   findFailedUrlsIndexes,
+  LAZY_load,
 }

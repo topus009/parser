@@ -1,73 +1,79 @@
 const _ = require('lodash');
 const helpers = require('./helpers');
 const files = require('./files');
-const prepareExcel = require('./prepareExcel');
-const buildReport = require('./workbook');
-const pre_megafon = require('./megafon/pre_megafon');
-const megafon = require('./megafon/megafon');
+// const prepareExcel = require('./prepareExcel');
+// const buildReport = require('./workbook');
+// const pre_megafon = require('./megafon/pre_megafon');
+// const megafon = require('./megafon/megafon');
 
-const full = [
-    {
-        fileName: 'kopikot',
-        uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
-        json: true,
-        extendedRequestOptions: {
-            headers: {'x-bonusway-locale': 'ru'}
-        }
-    },
-    {
-        fileName: 'promokodi_net',
-        uri: 'https://promokodi.net/store/cashback/',
-        json: false
-    },
-    {
-        fileName: 'simplybestcoupons',
-        uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
-        json: false
-    },
-    {
-        fileName: 'shopingbox',
-        uri: 'http://shopingbox.ru/box/all/',
-        json: false
-    },
-    {
-        fileName: 'cashback_ru',
-        uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
-        json: false
-    },
-];
+// const full = [
+//     {
+//         fileName: 'kopikot',
+//         uri: 'https://api.kopikot.ru/campaigns?limit=10000&offset=0',
+//         json: true,
+//         extendedRequestOptions: {
+//             headers: {'x-bonusway-locale': 'ru'}
+//         }
+//     },
+//     {
+//         fileName: 'promokodi_net',
+//         uri: 'https://promokodi.net/store/cashback/',
+//         json: false
+//     },
+//     {
+//         fileName: 'simplybestcoupons',
+//         uri: 'https://ru.simplybestcoupons.com/Stores/Cashback/',
+//         json: false
+//     },
+//     {
+//         fileName: 'shopingbox',
+//         uri: 'http://shopingbox.ru/box/all/',
+//         json: false
+//     },
+//     {
+//         fileName: 'cashback_ru',
+//         uri: 'https://cashback.ru/%D0%9A%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3_%D0%90-%D0%AF/all',
+//         json: false
+//     },
+// ];
 
-const paging = [
-    {
-        fileName: 'letyshops',
-        uri: 'https://letyshops.com/shops',
-        json: false
-    },
-    {
-        fileName: 'epn',
-        uri: 'https://epn.bz/ru/cashback/shops',
-        json: false
-    },
-    {
-        fileName: 'cashmeback',
-        uri: 'https://cashmeback.ru/catalog',
-        json: false
-    },
-];
+// const paging = [
+//     {
+//         fileName: 'letyshops',
+//         uri: 'https://letyshops.com/shops',
+//         json: false
+//     },
+//     {
+//         fileName: 'epn',
+//         uri: 'https://epn.bz/ru/cashback/shops',
+//         json: false
+//     },
+//     {
+//         fileName: 'cashmeback',
+//         uri: 'https://cashmeback.ru/catalog',
+//         json: false
+//     },
+// ];
 
 const lazy = [
     {
-        fileName: 'letyshops',
+        fileName: 'smarty_sale',
         uri: 'https://smarty.sale/shops/instrumenti',
     },
 ];
 
-const init = async (contents, second_title) => {
-    const {load, JSON_load, finish, findFailedUrlsIndexes} = helpers;
-    const full_promises = [];
-    const megafon_promises = [];
-    const paging_pre_promises = [];
-    const paging_promises = {};
+const init = async (contents, /*second_title*/) => {
+    const {
+        // load,
+        // JSON_load,
+        finish,
+        // findFailedUrlsIndexes,
+        LAZY_load,
+    } = helpers;
+    // const full_promises = [];
+    // const megafon_promises = [];
+    // const paging_pre_promises = [];
+    // const paging_promises = {};
     const lazy_promises = [];
     // ================= full ==============================
     // _.forEach(full, item => {
@@ -116,43 +122,44 @@ const init = async (contents, second_title) => {
     // ================= lazy ==============================
     _.forEach(lazy, item => {
         const {fileName, ...rest} = item;
-        const script = files.full[fileName];
-        full_promises.push(load({script, ...rest, contents}));
+        const {nextSelector, selectors} = files.lazy[fileName];
+        lazy_promises.push(LAZY_load({nextSelector, selectors, ...rest, contents}));
     });
     const lazyRes = await Promise.all(lazy_promises);
+    console.log('______________');
     console.log({lazyRes});
     console.log('______________');
-    // console.log('______________');
+    console.log('______________');
     // ================= lazy-end ==========================
     try {
-        const {
-            fullRes_filtered,
-            pagingRes_filtered,
-            fullRes_indexes,
-        } = findFailedUrlsIndexes({fullRes, pagingRes});
-        const filteredFinalPagingRes = _.filter(pagingRes_filtered, site => site.length);
-        const preparedExcel = prepareExcel({
-            prepared_megafon,
-            fullRes: fullRes_filtered,
-            pagingRes: filteredFinalPagingRes,
-        });
-        const list = [
-            {
-                fileName: 'megafon'
-            },
-            ..._.filter(full, (value, key) => !_.includes(fullRes_indexes, key)),
-            ..._.filter(paging, (site, key) => filteredFinalPagingRes[key]),
-        ];
-        buildReport(preparedExcel, list, second_title);
-        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        // const {
+        //     fullRes_filtered,
+        //     pagingRes_filtered,
+        //     fullRes_indexes,
+        // } = findFailedUrlsIndexes({fullRes, pagingRes});
+        // const filteredFinalPagingRes = _.filter(pagingRes_filtered, site => site.length);
+        // const preparedExcel = prepareExcel({
+        //     prepared_megafon,
+        //     fullRes: fullRes_filtered,
+        //     pagingRes: filteredFinalPagingRes,
+        // });
+        // const list = [
+        //     {
+        //         fileName: 'megafon'
+        //     },
+        //     ..._.filter(full, (value, key) => !_.includes(fullRes_indexes, key)),
+        //     ..._.filter(paging, (site, key) => filteredFinalPagingRes[key]),
+        // ];
+        // buildReport(preparedExcel, list, second_title);
+        // finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
         // buildReport(preparedExcel, list, '(обычный)');
-        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+        finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
         finish(contents, '11111-index', error);
     }
 
 }
 
-// init();
+init();
 
-module.exports = init;
+// module.exports = init;
