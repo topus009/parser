@@ -26,7 +26,7 @@ const paging = [
 ];
 
 const init = async (contents, second_title) => {
-    const {load, JSON_load, finish, findFailedUrlsIndexes} = helpers;
+    const {load, JSON_load, send, findFailedUrlsIndexes} = helpers;
     const full_promises = [];
     const megafon_promises = [];
     const paging_pre_promises = [];
@@ -95,11 +95,11 @@ const init = async (contents, second_title) => {
             ..._.filter(paging, (site, key) => filteredFinalPagingRes[key]),
         ];
         buildReport(preparedExcel, list, second_title);
-        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        send(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
         // buildReport(preparedExcel, list, '(обычный)');
-        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+        // send(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
-        finish(contents, '22222-index', error);
+        send(contents, '22222-index', error);
     }
 
 }

@@ -7,10 +7,10 @@ function extractItems(selectors) {
     const valueItems = document.querySelectorAll(value);
     const items = [];
     for (let key in titleItems) {
-      items.push({
-              title: titleItems[key].innerText,
-              value: valueItems[key].innerText
-          });
+        items.push({
+            title: titleItems[key].innerText,
+            value: valueItems[key].innerText
+        });
     }
     return items;
 }
@@ -43,14 +43,46 @@ async function scrapeInfiniteScrollItems({
 
 const puppeteerLoad = async ({uri, nextSelector, selectors}) => {
     const browser = await puppeteer.launch({
-    headless: false,
-        args: [
-            '--disable-notifications',
-        ],
-        // devtools: true
+        headless: false,
+            args: [
+                '--disable-notifications',
+                '--deterministic-fetch',
+                '--disable-gl-drawing-for-tests',
+                '--enable-low-res-tiling',
+                '--disable-accelerated-jpeg-decoding',
+                '--disable-gpu-rasterization',
+                // '--disable-gpu',
+                '--disable-composited-antialiasing',
+                '--disable-default-apps',
+                '--disable-extensions',
+                '--disable-local-storage',
+                '--disable-rtc-smoothness-algorithm',
+                '--disable-smooth-scrolling',
+                '--disable-background-networking',
+            ],
+            // devtools: true
     });
     const page = await browser.newPage();
-    page.setViewport({width: 1400, height: 900});
+    await page.setRequestInterception(true);
+    // const block_ressources = [
+    //     'image',
+    //     'stylesheet',
+    //     'media',
+    //     'font',
+    //     'texttrack',
+    //     'object',
+    //     'beacon',
+    //     'csp_report',
+    //     'imageset'
+    // ];
+    page.on('request', request => {
+        if (request.resourceType === 'document') {
+            request.continue();
+        } else {
+            request.abort();
+        }
+    });
+    page.setViewport({width: 640, height: 480});
     await page.goto(uri);
     const items = await scrapeInfiniteScrollItems({
         page,
@@ -60,8 +92,17 @@ const puppeteerLoad = async ({uri, nextSelector, selectors}) => {
         selectors,
     });
     await browser.close();
-    console.log({xxx: items});
-    return _.filter(items, item => !_.isEmpty(item));
+    // console.log({xxx: items});
+    const filteredItems = _.filter(items, item => !_.isEmpty(item));
+    const preparedItems = {
+        title: [],
+        value: [],
+    };
+    _.each(filteredItems, el => {
+        preparedItems.title.push(el.title);
+        preparedItems.value.push(el.value);
+    });
+    return preparedItems;
 }
 
 module.exports = puppeteerLoad;

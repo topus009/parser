@@ -6,7 +6,7 @@ const model = {
     value: 'children[1].children[3].children[1].children[0].data',
 };
 
-const prepareData = (item, index, path, uri) => {
+const prepareData = (item, index, path) => {
     let result = null;
     if(index === 'title') {
         result = _.map(item, el => _.get(el, path));

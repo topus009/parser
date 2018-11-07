@@ -43,14 +43,47 @@ async function scrapeInfiniteScrollItems({
 
 const puppeteerLoad = async ({uri, nextSelector, selectors}) => {
     const browser = await puppeteer.launch({
-    headless: true,
-        // args: [
-        //     '--disable-notifications',
-        // ],
-        // devtools: true
+        headless: false,
+            args: [
+                '--disable-notifications',
+                // '--deterministic-fetch',
+                // '--disable-gl-drawing-for-tests',
+                // '--enable-low-res-tiling',
+                // '--disable-accelerated-jpeg-decoding',
+                // '--disable-gpu-rasterization',
+                // '--disable-composited-antialiasing',
+                // '--disable-default-apps',
+                // '--disable-extensions',
+                // '--disable-local-storage',
+                // '--disable-rtc-smoothness-algorithm',
+                // '--disable-smooth-scrolling',
+                // '--disable-background-networking',
+
+                // '--disable-gpu',
+            ],
+            // devtools: true
     });
     const page = await browser.newPage();
-    page.setViewport({width: 1400, height: 900});
+    await page.setRequestInterception(true);
+    // const block_ressources = [
+    //     'image',
+    //     'stylesheet',
+    //     'media',
+    //     'font',
+    //     'texttrack',
+    //     'object',
+    //     'beacon',
+    //     'csp_report',
+    //     'imageset'
+    // ];
+    page.on('request', request => {
+        if (request.resourceType === 'document') {
+            request.continue();
+        } else {
+            request.abort();
+        }
+    });
+    page.setViewport({width: 640, height: 480});
     await page.goto(uri);
     const items = await scrapeInfiniteScrollItems({
         page,

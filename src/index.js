@@ -56,17 +56,17 @@ const paging = [
 ];
 
 const lazy = [
-    {
-        fileName: 'smarty_sale',
-        uri: 'https://smarty.sale/shops/instrumenti',
-    },
+    // {
+    //     fileName: 'smarty_sale',
+    //     uri: 'https://smarty.sale/shops/sport',
+    // },
 ];
 
 const init = async (contents, second_title) => {
     const {
         load,
         JSON_load,
-        finish,
+        send,
         findFailedUrlsIndexes,
         LAZY_load,
     } = helpers;
@@ -75,13 +75,18 @@ const init = async (contents, second_title) => {
     const paging_pre_promises = [];
     const paging_promises = {};
     const lazy_promises = [];
+    let lazyRes = [];
+    let pagingRes = {};
+    let fullRes = [];
     // ================= full ==============================
-    _.forEach(full, item => {
-        const {fileName, ...rest} = item;
-        const script = files.full[fileName];
-        full_promises.push(load({script, ...rest, contents}));
-    });
-    const fullRes = await Promise.all(full_promises);
+    if(!_.isEmpty(full)) {
+        _.forEach(full, item => {
+            const {fileName, ...rest} = item;
+            const script = files.full[fileName];
+            full_promises.push(load({script, ...rest, contents}));
+        });
+        fullRes = await Promise.all(full_promises);
+    }
     // ================= full-end ==========================
     // ================= megafon ===========================
     const megafon_links = await pre_megafon(contents);
@@ -92,44 +97,45 @@ const init = async (contents, second_title) => {
     const prepared_megafon = megafon(megafonRes);
     // ================= megafon-end =======================
     // ================= paging ============================
-    _.forEach(paging, ({fileName, uri}) => {
-        const {pre_load} = files.paging[fileName];
-        paging_pre_promises.push(pre_load({uri, title: fileName, contents}));
-    });
-    const paging_links = await Promise.all(paging_pre_promises);
-    for(const item of paging) {
-        const {fileName, ...rest} = item;
-        const {
-            prepare: script,
-            prefilter
-        } = files.paging[fileName];
-        for(const links of paging_links) {
-            const shopLinks = links[fileName];
-            if(shopLinks) {
-                paging_promises[fileName] = [];
-                for(const uri of shopLinks) {
-                    paging_promises[fileName].push(load({script, prefilter, ...rest, uri, contents}));
+    if(!_.isEmpty(paging)) {
+        _.forEach(paging, ({fileName, uri}) => {
+            const {pre_load} = files.paging[fileName];
+            paging_pre_promises.push(pre_load({uri, title: fileName, contents}));
+        });
+        const paging_links = await Promise.all(paging_pre_promises);
+        for(const item of paging) {
+            const {fileName, ...rest} = item;
+            const {
+                prepare: script,
+                prefilter
+            } = files.paging[fileName];
+            for(const links of paging_links) {
+                const shopLinks = links[fileName];
+                if(shopLinks) {
+                    paging_promises[fileName] = [];
+                    for(const uri of shopLinks) {
+                        paging_promises[fileName].push(load({script, prefilter, ...rest, uri, contents}));
+                    }
                 }
             }
         }
-    }
-    const pagingRes = {};
-    for(const site in paging_promises) {
-        const siteRes = await Promise.all(paging_promises[site]);
-        pagingRes[site] = siteRes;
+        for(const site in paging_promises) {
+            const siteRes = await Promise.all(paging_promises[site]);
+            pagingRes[site] = siteRes;
+        }
     }
     // ================= paging-end ========================
     // ================= lazy ==============================
-    _.forEach(lazy, item => {
-        const {fileName, ...rest} = item;
-        const {nextSelector, selectors} = files.lazy[fileName];
-        lazy_promises.push(LAZY_load({nextSelector, selectors, ...rest, contents}));
-    });
-    const lazyRes = await Promise.all(lazy_promises);
-    // console.log('______________');
-    // console.log({lazyRes});
-    // console.log('______________');
-    // console.log('______________');
+    if(!_.isEmpty(lazy)) {
+        contents.send('lazy-load-start');
+        _.forEach(lazy, item => {
+            const {fileName, ...rest} = item;
+            const {nextSelector, selectors} = files.lazy[fileName];
+            lazy_promises.push(LAZY_load({nextSelector, selectors, ...rest, contents}));
+        });
+        lazyRes = await Promise.all(lazy_promises);
+        contents.send('lazy-load-end');
+    }
     // ================= lazy-end ==========================
     try {
         const {
@@ -152,11 +158,11 @@ const init = async (contents, second_title) => {
             ..._.filter(paging, (site, key) => filteredFinalPagingRes[key]),
         ];
         buildReport(preparedExcel, list, second_title);
-        finish(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
+        send(contents, `ОТЧЕТ ${second_title} --> ГОТОВ`);
         // buildReport(preparedExcel, list, '(обычный)');
-        // finish(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
+        // send(contents, 'ОТЧЕТ (обычный) --> ГОТОВ');
     } catch (error) {
-        finish(contents, '11111-index', error);
+        send(contents, '11111-index', error);
     }
 
 }

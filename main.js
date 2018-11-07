@@ -23,6 +23,14 @@ function createWindow() {
     event.sender.send('FINISH_DATA', target);
   });
 
+  ipcMain.on('lazy-load-start', function (event) {
+    event.sender.send('lazy-load-start');
+  });
+
+  ipcMain.on('lazy-load-end', function (event) {
+    event.sender.send('lazy-load-end');
+  });
+
   mainWindow.on('closed', () => {
       mainWindow = null;
   });

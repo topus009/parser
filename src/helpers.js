@@ -57,7 +57,7 @@ const load = async ({uri, script, prefilter, json, extendedRequestOptions: opt, 
       }
     }
   } catch (error) {
-    finish(contents, '11111-helpers_load', error);
+    send(contents, '11111-helpers_load', error);
   }
 };
 
@@ -69,26 +69,26 @@ const pre_load_links = async ({uri, selector, getLastPage, newUrl, contents}) =>
   return _.map(pages, page => newUrl(page));
 };
 
-const finish = (contents, target) => {
+const send = (contents, target) => {
   contents.send('FINISH_DATA', target);
   // console.log('FINISH_DATA', target)
 };
 
 const JSON_load = async ({uri, opt, contents}) => {
   const res = await rp({...baseOptions(uri), ...parseJSONOptions, ...opt});
-  finish(contents, uri);
+  send(contents, uri);
   return res;
 };
 
 const HTML_load = async ({uri, opt, contents}) => {
   const res = await rp({...baseOptions(uri), ...parseHTMLOptions, ...opt});
-  finish(contents, uri);
+  send(contents, uri);
   return res;
 };
 
 const LAZY_load = async ({uri, contents, nextSelector, selectors}) => {
   const res = await puppeteerLoad({uri, nextSelector, selectors});
-  finish(contents, uri);
+  send(contents, uri);
   return res;
 };
 
@@ -146,7 +146,7 @@ module.exports = {
   parseJSONOptions,
   normalizeTitle,
   pre_load_links,
-  finish,
+  send,
   parseNumber,
   parseFormat,
   findFailedUrlsIndexes,
